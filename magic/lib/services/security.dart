@@ -34,7 +34,7 @@ class SecurityService {
     canCheckBio = canCheckBio ?? await canCheckBiometrics();
     isAuthSetup = isAuthSetup ?? await isAuthenticationPresent();
 
-    if (!canCheckBio || !isAuthSetup) {
+    if (!canCheckBio && !isAuthSetup) {
       // Device doesn't support biometrics or auth is not set up
       return true;
     }
