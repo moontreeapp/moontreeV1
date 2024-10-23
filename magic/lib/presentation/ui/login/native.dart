@@ -103,10 +103,12 @@ class LoginNativeState extends State<LoginNative> {
     bool isAuthSetUp = await securityService.isAuthenticationPresent();
     bool isAuthenticated = await securityService.authenticateUser();
     if (isAuthenticated) {
-      if (!supportsBiometrics) {
-        _showSecurityWarning(context, 'no_biometrics');
-      } else if (!isAuthSetUp) {
+      if (!isAuthSetUp) {
         _showSecurityWarning(context, 'no_auth_setup');
+      } else if (!supportsBiometrics && !Platform.isIOS) {
+        // if we get timed out on ios the supportsBiometric becomes False -
+        // a glitch in the package, so don't show this on ios.
+        _showSecurityWarning(context, 'no_biometrics');
       } else {
         /// moved to main.dart
         //await cubits.keys.load();
@@ -179,10 +181,11 @@ class LoginNativeState extends State<LoginNative> {
     } on PlatformException catch (e) {
       // Handle specific exceptions related to local_auth
       if (e.code == 'NotEnrolled' ||
-          e.code == 'LockedOut' ||
-          e.code == 'PermanentlyLockedOut' ||
-          e.code == 'NotAvailable' ||
-          e.code == 'OtherOperatingSystem') {
+              e.code == 'LockedOut' ||
+              e.code == 'PermanentlyLockedOut' ||
+              e.code == 'OtherOperatingSystem' ||
+              (e.code == 'NotAvailable' && !Platform.isIOS) // glitch in package
+          ) {
         _showNoBiometricsDialog();
       } else if (e.code == 'userCanceled' || e.code == 'userFallback') {
         // Handle user cancellation

@@ -123,10 +123,12 @@ class WelcomeBackScreenState extends State<WelcomeBackScreen> {
       isAuthSetup: isAuthSetUp,
     );
     if (isAuthenticated) {
-      if (!supportsBiometrics) {
-        _showSecurityWarning(context, 'no_biometrics');
-      } else if (!isAuthSetUp) {
+      if (!isAuthSetUp) {
         _showSecurityWarning(context, 'no_auth_setup');
+      } else if (!supportsBiometrics && !Platform.isIOS) {
+        // if we get timed out on ios the supportsBiometric becomes False -
+        // a glitch in the package, so don't show this on ios.
+        _showSecurityWarning(context, 'no_biometrics');
       } else {
         /// moved to main.dart
         //await cubits.keys.load();
