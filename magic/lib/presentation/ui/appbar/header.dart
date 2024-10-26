@@ -89,51 +89,44 @@ class Leading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocBuilder<AppbarCubit, AppbarState>(
-      buildWhen: (AppbarState previous, AppbarState current) =>
-          previous.leading != current.leading ||
-          previous.onLead != current.onLead,
-      builder: (context, state) {
-        return GestureDetector(
-            onTap: state.onLead,
-            child: Container(
-                height: 16 + screen.iconMedium + 16,
-                width: 24 + screen.iconMedium + 8,
-                alignment: Alignment.centerRight,
-                color: Colors.transparent,
-                padding: const EdgeInsets.only(right: 8),
-                child: () {
-                  if (state.leading == AppbarLeading.menu) {
-                    return Icon(Icons.menu_rounded,
-                        color: Colors.white, size: screen.iconMedium);
-                    //Container(
-                    //    height: screen.iconMedium,
-                    //    width: screen.iconMedium,
-                    //    alignment: Alignment.center,
-                    //    decoration: BoxDecoration(
-                    //        color: Colors.green,
-                    //        borderRadius: BorderRadius.circular(8)),
-                    //    child: Icon(Icons.wifi,
-                    //        color: Colors.green, size: screen.iconMedium)));
-                  }
-                  if (state.leading == AppbarLeading.back) {
-                    return Container(
-                        height: screen.iconMedium,
-                        width: screen.iconMedium,
-                        alignment: Alignment.center,
-                        child: Icon(Icons.chevron_left_rounded,
-                            color: Colors.white, size: screen.iconMedium));
-                  }
-                  if (state.leading == AppbarLeading.close) {
-                    return Container(
-                        height: screen.iconMedium,
-                        width: screen.iconMedium,
-                        alignment: Alignment.center,
-                        child: Icon(Icons.close_rounded,
-                            color: Colors.white, size: screen.iconMedium));
-                  }
-                  return const SizedBox.shrink();
-                }()));
-      });
+        buildWhen: (AppbarState previous, AppbarState current) =>
+            previous.leading != current.leading ||
+            previous.onLead != current.onLead,
+        builder: (context, state) {
+          return IconButton(
+            onPressed: state.onLead,
+            icon: () {
+              if (state.leading == AppbarLeading.menu) {
+                return Icon(
+                  Icons.menu_rounded,
+                  color: Colors.white,
+                  size: screen.iconMedium,
+                );
+              }
+              if (state.leading == AppbarLeading.back) {
+                return Icon(
+                  Icons.chevron_left_rounded,
+                  color: Colors.white,
+                  size: screen.iconMedium,
+                );
+              }
+              if (state.leading == AppbarLeading.close) {
+                return Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: screen.iconMedium,
+                );
+              }
+              return const SizedBox.shrink();
+            }(),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            style: const ButtonStyle(
+              splashFactory: NoSplash.splashFactory,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          );
+        },
+      );
 }
 
 class Title extends StatelessWidget {
@@ -184,11 +177,15 @@ class ConnectionIndicator extends StatelessWidget {
         /// status-offline
         /// loading - gif
         return GestureDetector(
-            onTap: () => cubits.toast.flash(
+            onTap: () {
+              if (state.connection != StreamingConnectionStatus.connected) {
+                cubits.toast.flash(
                     msg: ToastMessage(
                   title: 'connection status:',
                   text: state.connection.name,
-                )),
+                ));
+              }
+            },
             child: Container(
                 height: 16 + screen.iconMedium + 16,
                 width: 24 + screen.iconMedium,

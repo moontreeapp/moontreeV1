@@ -239,6 +239,7 @@ class MenuItem extends StatelessWidget {
       buildWhen: (MenuState previous, MenuState current) =>
           current.active && previous.sub != current.sub,
       builder: (context, state) {
+        bool isTablet = MediaQuery.of(context).size.shortestSide > 600;
         final padding = EdgeInsets.only(
             top: screen.appbar.height +
                 screen.canvas.midHeight +
@@ -262,7 +263,13 @@ class MenuItem extends StatelessWidget {
               SlideOver(
                   begin: const Offset(0, 0),
                   end: Offset(
-                      0, (Platform.isIOS ? y : -.866 - ((index - 1) * 0.014))),
+                    isTablet ? 0.01 : 0,
+                    (Platform.isIOS
+                        ? isTablet
+                            ? -.866 - ((index - 1) * 0.014)
+                            : y
+                        : -.866 - ((index - 1) * 0.014)),
+                  ),
                   delay: fadeDuration * index * .5,
                   duration: fadeDuration,
                   curve: Curves.easeInOutCubic,

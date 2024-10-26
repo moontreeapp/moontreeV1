@@ -65,6 +65,7 @@ dependencies:
   crypto: ^3.0.3
   qr_code_scanner: ^1.0.1
   mobile_scanner: ^6.0.0
+
   electrum_adapter: ^2.0.4
   bip32: ^2.0.0
   shared_preferences: ^2.3.2
@@ -79,6 +80,9 @@ dependencies:
   ansi_logger: ^2.0.11
   web_socket_client: ^0.1.0
   no_screenshot: ^0.3.1
+  screenshot: ^3.0.0
+  share_plus: ^10.1.1
+  path_provider: ^2.1.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

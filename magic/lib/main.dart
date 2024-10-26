@@ -190,92 +190,40 @@ class MaestroLayer extends StatefulWidget {
   State<MaestroLayer> createState() => _MaestroLayerState();
 }
 
-class _MaestroLayerState extends State<MaestroLayer>
-    with WidgetsBindingObserver {
-  bool _isInBackground = false;
-
-  @override
-  initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (_isInBackground) {
-          setState(() {
-            _isInBackground = false;
-          });
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-        setState(() {
-          _isInBackground = true;
-        });
-        break;
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-    }
-  }
-
-  @override
-  dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
+class _MaestroLayerState extends State<MaestroLayer> {
   @override
   Widget build(BuildContext context) {
     // see('is in background: $_isInBackground');
-    return Stack(
-      children: [
-        LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            _initializeServices(
-                context, constraints.maxHeight, constraints.maxWidth);
-            final scaffold = Scaffold(
-              resizeToAvoidBottomInset: false,
-              backgroundColor: AppColors.background,
-              body: SizedBox(
-                height: screen.height,
-                width: screen.width,
-                child: const Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    AppbarLayer(),
-                    CanvasLayer(),
-                    PaneLayer(),
-                    //NavbarLayer(),
-                    PanelLayer(),
-                    IgnoreLayer(),
-                    WelcomeLayer(),
-                    ToastLayer(),
-                    //const TutorialLayer(),
-                    LockLayer(),
-                  ],
-                ),
-              ),
-            );
-            //return Platform.isIOS ? SafeArea(child: scaffold) : scaffold;
-            return scaffold;
-          },
-        ),
-        if (_isInBackground)
-          Container(
-            color: Colors.black,
-            child: Center(
-              child: SvgPicture.asset(
-                LogoIcons.appLogo,
-                height: screen.appbar.logoHeight * 6,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-              ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        _initializeServices(
+            context, constraints.maxHeight, constraints.maxWidth);
+        final scaffold = Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: AppColors.background,
+          body: SizedBox(
+            height: screen.height,
+            width: screen.width,
+            child: const Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                AppbarLayer(),
+                CanvasLayer(),
+                PaneLayer(),
+                //NavbarLayer(),
+                PanelLayer(),
+                IgnoreLayer(),
+                WelcomeLayer(),
+                ToastLayer(),
+                //const TutorialLayer(),
+                LockLayer(),
+              ],
             ),
           ),
-      ],
+        );
+        //return Platform.isIOS ? SafeArea(child: scaffold) : scaffold;
+        return scaffold;
+      },
     );
   }
 }
@@ -287,69 +235,18 @@ class MaestroLayerIOS extends StatefulWidget {
   State<MaestroLayerIOS> createState() => _MaestroLayerIOSState();
 }
 
-class _MaestroLayerIOSState extends State<MaestroLayerIOS>
-    with WidgetsBindingObserver {
+class _MaestroLayerIOSState extends State<MaestroLayerIOS> {
   Widget? cachedLayout;
-  bool _isInBackground = false;
-
-  @override
-  initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (_isInBackground) {
-          setState(() {
-            _isInBackground = false;
-          });
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-        setState(() {
-          _isInBackground = true;
-        });
-        break;
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-    }
-  }
-
-  @override
-  dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            if (cachedLayout == null || hasSignificantChange(constraints)) {
-              cachedLayout = buildLayout(constraints);
-            }
-            return cachedLayout!;
-          },
-        ),
-        if (_isInBackground)
-          Container(
-            color: Colors.black,
-            child: Center(
-              child: SvgPicture.asset(
-                LogoIcons.appLogo,
-                height: screen.appbar.logoHeight * 6,
-                fit: BoxFit.contain,
-                alignment: Alignment.center,
-              ),
-            ),
-          ),
-      ],
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (cachedLayout == null || hasSignificantChange(constraints)) {
+          cachedLayout = buildLayout(constraints);
+        }
+        return cachedLayout!;
+      },
     );
   }
 

@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:magic/cubits/canvas/menu/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
@@ -10,9 +9,7 @@ import 'package:magic/domain/concepts/asset_icons.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/presentation/ui/canvas/balance/chips.dart';
-//import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/widgets/assets/amounts.dart';
-import 'package:magic/presentation/widgets/assets/icons.dart';
 import 'package:magic/services/services.dart';
 
 // TODO: implement chain icons for assets with the same name on different chains
@@ -23,61 +20,121 @@ import 'package:magic/services/services.dart';
 // extraSmall,
 // }
 
-class WalletPage extends StatelessWidget {
+class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
+
+  @override
+  WalletPageState createState() => WalletPageState();
+}
+
+class WalletPageState extends State<WalletPage> {
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  List<Holding> _filteredHoldings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _filteredHoldings = cubits.wallet.state.holdings
+        .where((holding) =>
+            Chips.combinedFilter(cubits.wallet.state.chips)(holding))
+        .toList();
+  }
+
+  void _updateFilteredHoldings() {
+    final newFilteredHoldings = cubits.wallet.state.holdings
+        .where((holding) =>
+            Chips.combinedFilter(cubits.wallet.state.chips)(holding))
+        .toList();
+
+    final oldFilteredHoldings = List<Holding>.from(_filteredHoldings);
+
+    _filteredHoldings = newFilteredHoldings;
+
+    final oldIndexMap = Map.fromEntries(oldFilteredHoldings
+        .asMap()
+        .entries
+        .map((e) => MapEntry(e.value, e.key)));
+
+    final itemsToRemove = oldFilteredHoldings
+        .where((item) => !newFilteredHoldings.contains(item))
+        .toList();
+    for (var item in itemsToRemove) {
+      int index = oldIndexMap[item] ?? -1;
+      if (index != -1) {
+        _listKey.currentState?.removeItem(
+            index, (context, animation) => _buildItem(item, animation),
+            duration: const Duration(milliseconds: 300));
+      }
+    }
+
+    final newIndexMap = Map.fromEntries(newFilteredHoldings
+        .asMap()
+        .entries
+        .map((e) => MapEntry(e.value, e.key)));
+    final itemsToAdd = newFilteredHoldings
+        .where((item) => !oldFilteredHoldings.contains(item))
+        .toList();
+    for (var item in itemsToAdd) {
+      int index = newIndexMap[item] ?? -1;
+      if (index != -1) {
+        _listKey.currentState?.insertItem(index);
+      }
+    }
+  }
+
+  Widget _buildItem(Holding holding, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: HoldingItem(holding: holding),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WalletCubit, WalletState>(
-        buildWhen: (previous, current) =>
-            previous.holdings != current.holdings ||
-            previous.chips != current.chips,
-        builder: (BuildContext context, WalletState walletState) =>
-            BlocBuilder<MenuCubit, MenuState>(
-                buildWhen: (previous, current) => previous.mode != current.mode,
-                builder: (BuildContext context, MenuState state) {
-                  /// all must satisfy
-                  //final filtered =
-                  //    walletState.holdings.toList(); // Create a copy of the list
-                  //filtered.removeWhere((holding) => walletState.chips
-                  //    .map((e) => e.filter)
-                  //    .any((filter) => !filter(holding)));
+      buildWhen: (previous, current) =>
+          previous.holdings != current.holdings ||
+          previous.chips != current.chips,
+      builder: (BuildContext context, WalletState walletState) =>
+          BlocBuilder<MenuCubit, MenuState>(
+        buildWhen: (previous, current) => previous.mode != current.mode,
+        builder: (BuildContext context, MenuState state) {
+          _updateFilteredHoldings();
 
-                  /// additive - any must satisfy
-                  //final filtered = walletState.holdings
-                  //    .where((holding) => walletState.chips
-                  //        .map((e) => e.filter)
-                  //        .any((filter) => filter(holding)))
-                  //    .toList();
+          /// all must satisfy
+          //final filtered =
+          //    walletState.holdings.toList(); // Create a copy of the list
+          //filtered.removeWhere((holding) => walletState.chips
+          //    .map((e) => e.filter)
+          //    .any((filter) => !filter(holding)));
 
-                  /// smart - depends...
-                  if (walletState.holdings.isEmpty) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: 3,
-                      itemBuilder: (context, index) => HoldingItemPlaceholder(
-                        delay: Duration(milliseconds: index * 67),
-                      ),
-                    );
-                  }
-                  final filtered = walletState.holdings
-                      .where((holding) =>
-                          Chips.combinedFilter(walletState.chips)(holding))
-                      .toList();
+          /// additive - any must satisfy
+          //final filtered = walletState.holdings
+          //    .where((holding) => walletState.chips
+          //        .map((e) => e.filter)
+          //        .any((filter) => filter(holding)))
+          //    .toList();
 
-                  return ListView.builder(
-                      controller: cubits.pane.state.scroller!,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.only(top: 8),
-                      itemCount: filtered.length,
-                      itemBuilder: (context, int index) {
-                        final holding = filtered[index];
-                        if (holding.isAdmin && holding.weHaveAdminOrMain) {
-                          return const SizedBox(height: 0);
-                        }
-                        return HoldingItem(holding: holding);
-                      });
-                }));
+          /// smart - depends...
+          if (walletState.holdings.isEmpty) {
+            return ListView.builder(
+              padding: const EdgeInsets.only(top: 8),
+              itemCount: 3,
+              itemBuilder: (context, index) => HoldingItemPlaceholder(
+                delay: Duration(milliseconds: index * 67),
+              ),
+            );
+          }
+          return AnimatedList(
+            key: _listKey,
+            initialItemCount: _filteredHoldings.length,
+            itemBuilder: (context, index, animation) {
+              return _buildItem(_filteredHoldings[index], animation);
+            },
+          );
+        },
+      ),
+    );
   }
 }
 

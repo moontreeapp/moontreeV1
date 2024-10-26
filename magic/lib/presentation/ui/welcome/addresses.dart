@@ -103,28 +103,22 @@ class AddressesPageState extends State<AddressesPage> {
                           onPressed: () =>
                               toStage(AddressesLifeCycle.exiting))),
                 ),
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Container(
-                      constraints:
-                          BoxConstraints(maxHeight: screen.height - 56),
-                      alignment: Alignment.center,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount:
-                              cubits.keys.master.derivationWallets.length +
-                                  cubits.keys.master.keypairWallets.length,
-                          itemBuilder: (context, int index) {
-                            if (index <
-                                cubits.keys.master.derivationWallets.length) {
-                              printOutSecrets();
-                              return DerivativeWalletSecret(index: index);
-                            }
-                            return KeyPairSecret(
-                                index: index -
-                                    cubits
-                                        .keys.master.derivationWallets.length);
-                          })),
-                ]),
+                Expanded(
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: cubits.keys.master.derivationWallets.length +
+                          cubits.keys.master.keypairWallets.length,
+                      itemBuilder: (context, int index) {
+                        if (index <
+                            cubits.keys.master.derivationWallets.length) {
+                          //printOutSecrets(); // for testing
+                          return DerivativeWalletSecret(index: index);
+                        }
+                        return KeyPairSecret(
+                            index: index -
+                                cubits.keys.master.derivationWallets.length);
+                      }),
+                ),
               ],
             ),
           ),

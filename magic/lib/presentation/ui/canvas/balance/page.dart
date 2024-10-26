@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:magic/cubits/canvas/balance/cubit.dart';
-import 'package:magic/cubits/canvas/menu/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/pane/cubit.dart';
-import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/theme/text.dart';
 import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/ui/canvas/balance/wallet.dart';
-import 'package:magic/presentation/ui/pane/send/page.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/services/services.dart';
 
@@ -81,12 +78,9 @@ class AnimatedBalance extends StatelessWidget {
                                       ])),
                               Text('Portfolio', style: AppText.usdHolding),
                             ]),
-                        AnimatedOpacity(
-                            duration: fadeDuration,
-                            curve: Curves.easeInOutCubic,
-                            opacity: paneState.height == screen.pane.minHeight
-                                ? 0
-                                : 1,
-                            child: const ChipsView()),
+                        Visibility(
+                          visible: paneState.height != screen.pane.minHeight,
+                          child: const ChipsView(),
+                        ),
                       ]))));
 }
