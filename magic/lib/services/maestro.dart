@@ -5,13 +5,13 @@ import 'package:magic/cubits/fade/cubit.dart';
 import 'package:magic/cubits/mixins.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
-import 'package:magic/domain/concepts/numbers/sats.dart';
 import 'package:magic/domain/concepts/sections.dart';
 import 'package:magic/cubits/cubit.dart' show cubits;
 import 'package:magic/domain/concepts/transaction.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/assets/names.dart';
 import 'package:magic/services/services.dart';
+import 'package:magic/utils/log.dart';
 
 class Maestro {
   List<NavbarSection> sectionsHistory = [];

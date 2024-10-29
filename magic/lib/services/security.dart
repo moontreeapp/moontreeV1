@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/services.dart';
@@ -67,19 +68,22 @@ class SecurityService {
       await secureStorage.delete(key: SecureStorageKey.authed.key());
 
   Future<bool> checkUSBDebuggingStatus(BuildContext context) async {
-    const platform = MethodChannel('usb_debug_check');
-    try {
-      final bool isEnabled =
-          await platform.invokeMethod('isUSBDebuggingEnabled');
-      if (isEnabled && context.mounted) {
-        showUSBDebuggingWarningDialog(context);
-        return true;
+    if (Platform.isAndroid) {
+      const platform = MethodChannel('usb_debug_check');
+      try {
+        final bool isEnabled =
+            await platform.invokeMethod('isUSBDebuggingEnabled');
+        if (isEnabled && context.mounted) {
+          showUSBDebuggingWarningDialog(context);
+          return true;
+        }
+        return false;
+      } on PlatformException catch (e) {
+        see("Failed to check USB Debugging: '${e.message}'.");
+        return false;
       }
-      return false;
-    } on PlatformException catch (e) {
-      see("Failed to check USB Debugging: '${e.message}'.");
-      return false;
     }
+    return false;
   }
 
   Future<bool> disableScreenshot() async {
