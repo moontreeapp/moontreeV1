@@ -92,6 +92,56 @@ class WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<WalletCubit, WalletState>(
+        buildWhen: (previous, current) =>
+            previous.holdings != current.holdings ||
+            previous.chips != current.chips,
+        builder: (BuildContext context, WalletState walletState) =>
+            BlocBuilder<MenuCubit, MenuState>(
+                buildWhen: (previous, current) => previous.mode != current.mode,
+                builder: (BuildContext context, MenuState state) {
+                  /// all must satisfy
+                  //final filtered =
+                  //    walletState.holdings.toList(); // Create a copy of the list
+                  //filtered.removeWhere((holding) => walletState.chips
+                  //    .map((e) => e.filter)
+                  //    .any((filter) => !filter(holding)));
+
+                  /// additive - any must satisfy
+                  //final filtered = walletState.holdings
+                  //    .where((holding) => walletState.chips
+                  //        .map((e) => e.filter)
+                  //        .any((filter) => filter(holding)))
+                  //    .toList();
+
+                  /// smart - depends...
+                  if (walletState.holdings.isEmpty) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: 3,
+                      itemBuilder: (context, index) => HoldingItemPlaceholder(
+                        delay: Duration(milliseconds: index * 67),
+                      ),
+                    );
+                  }
+                  final filtered = walletState.holdings
+                      .where((holding) =>
+                          Chips.combinedFilter(walletState.chips)(holding))
+                      .toList();
+
+                  return ListView.builder(
+                      controller: cubits.pane.state.scroller!,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.only(top: 8),
+                      itemCount: filtered.length,
+                      itemBuilder: (context, int index) {
+                        final holding = filtered[index];
+                        if (holding.isAdmin && holding.weHaveAdminOrMain) {
+                          return const SizedBox(height: 0);
+                        }
+                        return HoldingItem(holding: holding);
+                      });
+                }));
+    /*BlocBuilder<WalletCubit, WalletState>(
       buildWhen: (previous, current) =>
           previous.holdings != current.holdings ||
           previous.chips != current.chips,
@@ -134,12 +184,13 @@ class WalletPageState extends State<WalletPage> {
           );
         },
       ),
-    );
+    );*/
   }
 }
 
 class HoldingItem extends StatelessWidget {
   final Holding holding;
+
   const HoldingItem({super.key, required this.holding});
 
   @override
