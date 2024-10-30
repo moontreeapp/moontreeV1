@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:magic/cubits/cubit.dart';
-import 'package:magic/presentation/utils/animation.dart';
+import 'package:magic/presentation/ui/welcome/pair_with_chrome.dart';
 import 'package:magic/utils/log.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QRViewable extends StatefulWidget {
   const QRViewable({super.key});
+
   @override
   State<StatefulWidget> createState() => QRViewableState();
 }
@@ -15,7 +16,7 @@ class QRViewableState extends State<QRViewable> with WidgetsBindingObserver {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   final MobileScannerController controller = MobileScannerController();
   StreamSubscription<Object?>? _subscription;
-  String? barcode;
+  ScannerMessage? barcode;
 
   void _handleBarcode(BarcodeCapture event) {
     try {
@@ -93,7 +94,10 @@ class QRViewableState extends State<QRViewable> with WidgetsBindingObserver {
             controller: controller,
             onDetect: (BarcodeCapture event) {
               if (event.barcodes.first.rawValue?.isNotEmpty ?? false) {
-                cubits.send.update(address: barcode);
+                cubits.send.update(
+                  address: barcode?.sendTo?.trim() ?? '',
+                  amount: barcode?.sendAmount?.trim(),
+                );
                 cubits.send.update(scanActive: false);
                 see(cubits.send.state.address);
                 see(event);
@@ -103,10 +107,17 @@ class QRViewableState extends State<QRViewable> with WidgetsBindingObserver {
                 see(event.raw);
               }
               setState(() {
-                barcode = event.barcodes.first.rawValue;
-                if (barcode?.isNotEmpty ?? false) {
-                  cubits.send.update(fromQR: true, address: barcode);
-                  cubits.send.update(scanActive: false);
+                barcode =
+                    ScannerMessage(raw: event.barcodes.first.rawValue ?? '');
+                if (barcode?.raw.isNotEmpty ?? false) {
+                  cubits.send.update(
+                    fromQR: true,
+                    address: barcode?.sendTo?.trim() ?? '',
+                    amount: barcode?.sendAmount?.trim() ?? '',
+                  );
+                  cubits.send.update(
+                    scanActive: false,
+                  );
                 }
               });
               // Consider stopping the scanner after a slight delay if necessary

@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
+import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/presentation/theme/colors.dart';
+import 'package:magic/presentation/ui/pane/send/page.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/services/server_connection.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/cubits/cubits.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/utils/log.dart';
 
@@ -36,7 +39,10 @@ class PairWithChromePageState extends State<PairWithChromePage>
   final MobileScannerController controller = MobileScannerController();
   String? barcode;
 
-  void toStage(PairWithChromeLifeCycle stage) {
+  void toStage(
+    PairWithChromeLifeCycle stage, {
+    Map<String, dynamic>? scannedValue,
+  }) {
     if (mounted) {
       if (stage == PairWithChromeLifeCycle.exiting) {
         cubits.app.animating = true;
@@ -44,9 +50,55 @@ class PairWithChromePageState extends State<PairWithChromePage>
           cubits.welcome.update(active: false, child: const SizedBox.shrink());
           cubits.app.animating = false;
         });
+        if (scannedValue != null && scannedValue.containsKey('address')) {
+          final String address = scannedValue['address'].toString();
+          final String amount = scannedValue['amt'] ?? '';
+          _activateSend(
+            address: address,
+            amount: amount,
+          );
+        }
       }
       setState(() => lifecycle = stage);
     }
+  }
+
+  Future<void> _activateSend({
+    required String address,
+    required String amount,
+  }) async {
+    if (address.isEmpty) {
+      return;
+    }
+
+    final String coinType = address[0].toLowerCase();
+
+    final Holding? holding = cubits.wallet.state.holdings.firstWhereOrNull(
+      (e) => e.blockchain.chain.title.toLowerCase().startsWith(coinType),
+    );
+
+    if (holding == null) {
+      cubits.toast.flash(
+        msg: const ToastMessage(
+          text: 'Holding not found, please try again',
+        ),
+      );
+      return;
+    }
+
+    cubits.welcome.update(
+      active: true,
+      child: const SendContent(),
+    );
+    await maestro.activateHistory(
+      holding: holding,
+      redirectOnEmpty: true,
+    );
+    maestro.activateSend(
+      address: address,
+      amount: amount,
+      redirectToPreview: true,
+    );
   }
 
   @override
@@ -146,24 +198,55 @@ class PairWithChromePageState extends State<PairWithChromePage>
                               .map((e) => e.h160AsByteData(blockchain))
                               .toList()
                       ].expand((i) => i).toSet().toList();
-                      see(msg.pairCode);
-                      see(hdPubKeys, kpPubKeys);
-                      // Todo: Send data to server
-                      //sendDataToServer(msg.pairCode, hdPubKeys, kpPubKeys);
-                      WebSocketEndpoint(
-                        endpoint: msg.scannerMessageType.toServerEndpoint,
-                        params: {
-                          'code': msg.pairCode,
-                          'hd_pubkeys': hdPubKeys,
-                          'keypair_pubkeys': kpPubKeys,
-                        },
-                      ).send();
+
+                      switch (msg.scannerMessageType) {
+                        case ScannerMessageType.pair:
+                          see(msg.pairCode);
+                          see(hdPubKeys, kpPubKeys);
+                          WebSocketEndpoint(
+                            endpoint: msg.scannerMessageType.toServerEndpoint,
+                            params: {
+                              'code': msg.pairCode,
+                              'hd_pubkeys': hdPubKeys,
+                              'keypair_pubkeys': kpPubKeys,
+                            },
+                          ).send();
+                          toStage(PairWithChromeLifeCycle.exiting);
+                          break;
+
+                        case ScannerMessageType.send:
+                          if (msg.sendTo != null && msg.sendTo!.isNotEmpty) {
+                            toStage(PairWithChromeLifeCycle.exiting,
+                                scannedValue: {
+                                  'address': msg.sendTo?.trim(),
+                                  'amt': msg.sendAmount?.trim(),
+                                });
+                          } else {
+                            toStage(PairWithChromeLifeCycle.exiting);
+                            cubits.toast.flash(
+                              msg: const ToastMessage(
+                                text: 'Address not found',
+                                title: 'Invalid QR',
+                              ),
+                            );
+                          }
+                          break;
+
+                        case ScannerMessageType.unknown:
+                          toStage(PairWithChromeLifeCycle.exiting);
+                          cubits.toast.flash(
+                            msg: const ToastMessage(
+                              text: 'Invalid QR',
+                              title: 'Something went wrong!',
+                            ),
+                          );
+
+                        default:
+                          toStage(PairWithChromeLifeCycle.exiting);
+                          see('Unknown or unsupported QR code action');
+                          break;
+                      }
                       controller.stop();
-                      toStage(PairWithChromeLifeCycle.exiting);
-                      //toStage(PairWithChromeLifeCycle.paused);
-                      //Future.delayed(const Duration(milliseconds: 500), () {
-                      //  toStage(PairWithChromeLifeCycle.exiting);
-                      //});
                     }
                   },
                 ),
@@ -242,17 +325,34 @@ class ScannerMessage {
 
   const ScannerMessage({required this.raw});
 
-  ScannerMessageType get scannerMessageType =>
-      ScannerMessageType.from(message['action'] as String);
+  Map<String, dynamic> get message {
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } on FormatException {
+      return {'rawData': raw};
+    } catch (e) {
+      return {'error': 'An error occurred: $e'};
+    }
+  }
 
-  Map<String, dynamic> get message => jsonDecode(raw) as Map<String, dynamic>;
+  ScannerMessageType get scannerMessageType => ScannerMessageType.from(
+        message['action'] ?? (sendTo != null ? 'send' : 'unknown'),
+      );
 
   String get pairCode =>
-      (message['code'] ?? message['params']['code'] ?? '') as String;
-  String get sendTo => message['params']['to'] as String;
-  String get sendAmount => message['params']['amount'] as String;
-  int get sendSats => int.tryParse(message['params']['amount'] as String) ?? 0;
-  String get sendAsset => message['params']['asset'] as String;
-  Blockchain get sendBlockchain =>
-      Blockchain.from(name: message['params']['blockchain'] as String);
+      (message['code'] ?? message['params']?['code'] ?? '') as String;
+
+  String? get sendTo =>
+      (message['params']?['to'] ?? message['to'] ?? raw) as String?;
+
+  String? get sendAmount => message['params']?['amount'] as String?;
+
+  int get sendSats =>
+      int.tryParse(message['params']?['amount'] as String? ?? '') ?? 0;
+
+  String? get sendAsset => message['params']?['asset'] as String?;
+
+  Blockchain? get sendBlockchain => message['params']?['blockchain'] != null
+      ? Blockchain.from(name: message['params']?['blockchain'] as String)
+      : null;
 }

@@ -216,10 +216,11 @@ class Maestro {
 
   Future<void> activateHome() async {
     if (locked) {
-      return;
+      locked = false; // if locked shouldn't we not do anything? return; ?
     } else {
       locked = true;
     }
+    see('activating home');
     cubits.wallet.populateAssets(30);
     cubits.app.animating = true;
     // if pane is not in middle move it to middle first
@@ -438,7 +439,11 @@ class Maestro {
     locked = false;
   }
 
-  Future<void> activateSend() async {
+  Future<void> activateSend({
+    String? address,
+    String? amount,
+    bool redirectToPreview = false,
+  }) async {
     if (locked) {
       return;
     } else {
@@ -467,11 +472,19 @@ class Maestro {
       min: screen.pane.midHeightPercent,
     );
     await inactivateAllBut(cubits.send.key);
-    cubits.send.update(active: true);
+    cubits.send.update(
+      active: true,
+      address: address,
+      amount: amount,
+    );
     cubits.fade.update(fade: FadeEvent.fadeIn);
     cubits.ignore.update(active: false);
     await Future.delayed(slideDuration, () => cubits.app.animating = false);
     locked = false;
+
+    if (redirectToPreview && cubits.send.validateForm()) {
+      cubits.send.send();
+    }
   }
 
   Future<void> activateReceive(Blockchain blockchain) async {

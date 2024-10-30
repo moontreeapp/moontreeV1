@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:magic/cubits/fade/cubit.dart';
+import 'package:magic/domain/concepts/numbers/coin.dart';
+import 'package:magic/presentation/utils/animation.dart';
+import 'package:magic/services/services.dart';
 import 'package:magic/utils/log.dart';
 import 'package:tuple/tuple.dart';
 import 'package:collection/collection.dart';
@@ -21,8 +25,9 @@ import 'package:wallet_utils/wallet_utils.dart'
     show
         ECPair,
         FeeRate,
-        TransactionBuilder,
         Transaction,
+        TransactionBuilder,
+        cheapFee,
         satsPerCoin,
         standardFee;
 import 'package:moontree_utils/moontree_utils.dart';
@@ -624,6 +629,169 @@ class SendCubit extends UpdatableCubit<SendState> {
                 )));
       }
     }
+  }
+
+  bool validateAddress(String address) =>
+      validateAddressNotEmpty(address) && validateAddressByBlockchain(address);
+
+  List<String> invalidAddressMessages(String address) => [
+        if (!validateAddressNotEmpty(address)) 'cannot be empty',
+        if (!validateAddressByBlockchain(address)) 'invalid',
+      ];
+
+  bool validateAddressNotEmpty(String address) => address.isNotEmpty;
+  bool validateAddressByBlockchain(String address) =>
+      (cubits.holding.state.holding.blockchain.isAddress(address));
+
+  bool validateAmount(String amount) {
+    final cleanAmount = amount.replaceAll(',', '');
+    return validateAmountNotEmpty(cleanAmount) &&
+        validateAmountWithinDivisibility(cleanAmount) &&
+        validateAmountAbleToParse(cleanAmount) &&
+        validateAmountGTZero(cleanAmount) &&
+        validateAmountByBlockchain(cleanAmount) &&
+        validateAmountLTTotal(cleanAmount);
+  }
+
+  List<String> invalidAmountMessages(String amount) {
+    final cleanAmount = amount.replaceAll(',', '');
+    return [
+      if (!validateAmountNotEmpty(cleanAmount)) 'cannot be empty',
+      if (!validateAmountWithinDivisibility(cleanAmount))
+        'too many decimal places',
+      if (!validateAmountAbleToParse(cleanAmount)) 'invalid',
+      if (!validateAmountGTZero(cleanAmount)) 'must be greater than 0',
+      if (!validateAmountByBlockchain(cleanAmount)) 'invalid',
+      if (!validateAmountLTTotal(cleanAmount)) 'insufficient balance',
+    ];
+  }
+
+  bool validateAmountNotEmpty(String amount) => amount.isNotEmpty;
+  bool validateAmountWithinDivisibility(String amount) =>
+      amount.contains('.') ? amount.split('.').last.length <= 8 : true;
+  bool validateAmountAbleToParse(String amount) =>
+      double.tryParse(amount.replaceAll(',', '')) != null;
+  bool validateAmountGTZero(String amount) =>
+      (double.tryParse(amount.replaceAll(',', '')) ?? -1) > 0.000000009;
+  bool validateAmountByBlockchain(String amount) =>
+      (cubits.holding.state.holding.blockchain
+          .isAmount((double.tryParse(amount.replaceAll(',', '')) ?? -1)));
+  bool validateAmountLTTotal(String amount) =>
+      (cubits.holding.state.holding.coin.toDouble() >=
+          (double.tryParse(amount.replaceAll(',', '')) ?? -1));
+
+  bool validateForm() =>
+      validateAddress(state.address) && validateAmount(state.amount);
+
+  Future<void> send() async {
+    cubits.fade.update(fade: FadeEvent.fadeOut);
+    // maybe we can shorten or remove: cubit may take more than that time anyway
+    await Future.delayed(fadeDuration);
+    update(isSubmitting: true);
+    cubits.fade.update(fade: FadeEvent.fadeIn);
+
+    // validate address is valid
+    // validate amount is a valid amount
+    // validate amount is less than amount we hold of this asset
+    // validate memo?
+    // generate a send request
+    /**
+        final SendRequest sendRequest = SendRequest(
+        sendAll: holdingBalance.amount == state.amount,
+        wallet: Current.wallet,
+        sendAddress: state.address,
+        holding: holdingBalance.amount,
+        visibleAmount: _asDoubleString(state.amount),
+        sendAmountAsSats: state.sats,
+        feeRate: state.fee,
+        security: state.security,
+        assetMemo: state.security != pros.securities.currentCoin &&
+        state.memo != '' &&
+        state.memo.isIpfs
+        ? state.memo
+        : null,
+        //TODO: Currently memos are only for non-asset transactions
+        memo: state.security == pros.securities.currentCoin &&
+        state.memo != '' &&
+        _verifyMemo(state.memo)
+        ? state.memo
+        : null,
+        note: state.note != '' ? state.note : null,
+        );
+     */
+    final sendSats =
+        Coin.fromString(state.amount.replaceAll(',', '')).toSats().value;
+    final sendAll = sendSats == cubits.holding.state.holding.sats.value &&
+        cubits.holding.state.holding.isCurrency;
+    update(
+        sendRequest: SendRequest(
+      sendAll: sendAll,
+      sendAddress: state.address,
+      holding: cubits.holding.state.holding.coin.toDouble(),
+      visibleAmount: state.amount,
+      sendAmountAsSats: sendSats,
+      feeRate: cheapFee,
+      //security: state.security,
+      // only for hard mode
+      //assetMemo: state.security != pros.securities.currentCoin &&
+      //        state.memo != '' &&
+      //        state.memo.isIpfs
+      //    ? state.memo
+      //    : null,
+      //memo: state.security == pros.securities.currentCoin &&
+      //        state.memo != '' &&
+      //        _verifyMemo(state.memo)
+      //    ? state.memo
+      //    : null,
+      //note: state.note != '' ? state.note : null,
+    ));
+
+    // send the request
+    // // _confirmSend(sendRequest, cubit);
+    // go to the confirm page
+    // on that page display results of transaction
+    // sign it.
+    await setUnsignedTransaction(
+      sendAllCoinFlag: sendAll,
+      symbol: cubits.holding.state.holding.symbol,
+      blockchain: cubits.holding.state.holding.blockchain,
+    );
+    await signUnsignedTransaction();
+    final validateMsg = await verifyTransaction();
+    see(validateMsg);
+    if (!validateMsg.item1) {
+      update(
+          signedTransactions: [],
+          txHashes: [],
+          removeUnsignedTransaction: true,
+          removeEstimate: true);
+      cubits.toast.flash(
+          msg: const ToastMessage(
+        title: 'Error',
+        text: 'Unable to generate transaction',
+        //positive: false,
+        //copy: validateMsg.item2,
+        //label: 'copy'
+      ));
+    } else {
+      cubits.appbar.update(
+        onLead: () {
+          update(
+            signedTransactions: [],
+            removeUnsignedTransaction: true,
+            removeEstimate: true,
+          );
+          cubits.appbar.update(
+            onLead: () {
+              reset();
+              maestro.activateHistory();
+            },
+          );
+        },
+      );
+    }
+    update(isSubmitting: false);
+    cubits.fade.update(fade: FadeEvent.fadeIn);
   }
 
   /**from v2
