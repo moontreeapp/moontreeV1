@@ -80,6 +80,9 @@ class AnimatedBalance extends StatelessWidget {
                             ]),
                         Visibility(
                           visible: paneState.height != screen.pane.minHeight,
+                          maintainState: true,
+                          maintainAnimation: true,
+                          maintainSize: true,
                           child: const ChipsView(),
                         ),
                       ]))));
