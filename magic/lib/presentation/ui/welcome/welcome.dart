@@ -12,6 +12,7 @@ import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
+import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'package:magic/services/security.dart';
 import 'package:magic/utils/log.dart';
@@ -35,6 +36,7 @@ class WelcomeLayer extends StatelessWidget {
 
 class WelcomeBackScreen extends StatefulWidget {
   final SvgPicture? imageWidget;
+
   const WelcomeBackScreen({super.key, this.imageWidget});
 
   @override
@@ -256,31 +258,21 @@ class WelcomeBackScreenState extends State<WelcomeBackScreen> {
                         width: double.infinity,
                         height: 60,
                         child: BlocBuilder<AppCubit, AppState>(
-                            buildWhen: (AppState previous, AppState current) =>
-                                previous.connection != current.connection,
-                            builder: (BuildContext context, AppState state) {
-                              //if (state.connection ==
-                              //    StreamingConnectionStatus.connected) {
-                              return ElevatedButton(
-                                onHover: (_) => cubits.app.animating = true,
-                                onPressed: _handleAuthentication,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.button,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "LET'S GO",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                              //}
-                            }),
+                          buildWhen: (AppState previous, AppState current) =>
+                              previous.connection != current.connection,
+                          builder: (BuildContext context, AppState state) {
+                            //if (state.connection ==
+                            //    StreamingConnectionStatus.connected) {
+                            return AppButton(
+                              label: 'LET\'S GO',
+                              onPressed: _handleAuthentication,
+                              onHover: (_) => cubits.app.animating = true,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            );
+                            //}
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 16),

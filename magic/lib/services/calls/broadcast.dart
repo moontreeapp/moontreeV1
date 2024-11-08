@@ -1,5 +1,7 @@
 /// does this endpoint take into consideration the need to grab enough rvn for
 /// the asset?
+library;
+
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/server/serverv2_client.dart';
 import 'package:magic/services/calls/server.dart';

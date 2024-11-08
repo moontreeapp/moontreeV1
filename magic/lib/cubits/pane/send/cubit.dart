@@ -293,7 +293,7 @@ class SendCubit extends UpdatableCubit<SendState> {
       return coinFee;
     }
 
-    Map<String, int> _parseAsset(maybeOpRVNAssetTuplePtr, opCodes) {
+    Map<String, int> parseAsset(maybeOpRVNAssetTuplePtr, opCodes) {
       // this part doesn't work, so we do it manually below
       //final assetTransferData = parseAssetTransfer(
       //    opCodes.sublist(maybeOpRVNAssetTuplePtr), x.script!);
@@ -345,7 +345,7 @@ class SendCubit extends UpdatableCubit<SendState> {
                   return true;
                 }
               } else {
-                final nameSats = _parseAsset(maybeOpRVNAssetTuplePtr, opCodes);
+                final nameSats = parseAsset(maybeOpRVNAssetTuplePtr, opCodes);
                 if (nameSats[state.unsignedTransaction!.security.symbol] ==
                     state.unsignedTransaction!.sats) {
                   return true;

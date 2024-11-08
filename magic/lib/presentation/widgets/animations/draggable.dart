@@ -11,11 +11,11 @@ class DraggableSnappableSheetExample extends StatefulWidget {
     this.child,
   });
   @override
-  _DraggableSnappableSheetExampleState createState() =>
-      _DraggableSnappableSheetExampleState();
+  DraggableSnappableSheetExampleState createState() =>
+      DraggableSnappableSheetExampleState();
 }
 
-class _DraggableSnappableSheetExampleState
+class DraggableSnappableSheetExampleState
     extends State<DraggableSnappableSheetExample>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
@@ -27,7 +27,7 @@ class _DraggableSnappableSheetExampleState
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
     _topPosition = widget.min;
   }

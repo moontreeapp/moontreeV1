@@ -10,6 +10,7 @@ export 'package:magic/cubits/navbar/cubit.dart';
 export 'package:magic/cubits/pane/cubit.dart';
 export 'package:magic/cubits/pane/receive/cubit.dart';
 export 'package:magic/cubits/pane/send/cubit.dart';
+export 'package:magic/cubits/pane/pool/cubit.dart';
 export 'package:magic/cubits/pane/swap/cubit.dart';
 export 'package:magic/cubits/pane/manage/cubit.dart';
 export 'package:magic/cubits/pane/transaction/cubit.dart';

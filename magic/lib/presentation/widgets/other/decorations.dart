@@ -18,7 +18,7 @@ class SideShadowWrapper extends StatelessWidget {
           //color: Colors.white,
           boxShadow: active
               ? [
-                  BoxShadow(
+                  const BoxShadow(
                       color: Colors.black,
                       blurRadius: 100,
                       offset: Offset(-1, 0)),
@@ -26,7 +26,8 @@ class SideShadowWrapper extends StatelessWidget {
               : null,
           border: active
               ? null
-              : Border(left: BorderSide(color: Colors.black, width: .25))),
+              : const Border(
+                  left: BorderSide(color: Colors.black, width: .25))),
       child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(

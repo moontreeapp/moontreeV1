@@ -65,45 +65,31 @@ class NotificationItem extends StatelessWidget {
   const NotificationItem({super.key, required this.state});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-      onTap: cubits.menu.toggleSetting,
-      child: Container(
-          height: screen.menu.itemHeight,
-          width: screen.width,
-          color: Colors.transparent,
-          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Icon(
-                state.setting
-                    ? Icons.notifications_on_rounded
-                    : Icons.notifications_off_rounded,
-                color: Colors.white),
-            const SizedBox(width: 16),
-            Text('Notification: ${state.setting ? 'On' : 'Off'}',
-                style: AppText.h2.copyWith(color: Colors.white)),
-          ])));
+  Widget build(BuildContext context) => MenuItem(
+        icon: state.setting
+            ? Icons.notifications_on_rounded
+            : Icons.notifications_off_rounded,
+        text: 'Notification: ${state.setting ? 'On' : 'Off'}',
+        onTap: cubits.menu.toggleSetting,
+      );
 }
 
 class BackupItem extends StatelessWidget {
   const BackupItem({super.key});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => MenuItem(
+        icon: Icons.key_sharp,
+        text: 'Backup',
         onTap: () => cubits.welcome.update(
-            active: true,
-            allowScreenshot: false,
-            child: LoginNative(
-                onFailure: () => cubits.welcome
-                    .update(active: false, child: const SizedBox.shrink()),
-                child: const BackupPage())),
-        child: Container(
-            height: screen.menu.itemHeight,
-            width: screen.width,
-            color: Colors.transparent,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              const Icon(Icons.key_sharp, color: Colors.white),
-              const SizedBox(width: 16),
-              Text('Backup', style: AppText.h2.copyWith(color: Colors.white)),
-            ])),
+          active: true,
+          allowScreenshot: false,
+          child: LoginNative(
+            onFailure: () => cubits.welcome
+                .update(active: false, child: const SizedBox.shrink()),
+            child: const BackupPage(),
+          ),
+        ),
       );
 }
 
@@ -111,21 +97,14 @@ class ImportItem extends StatelessWidget {
   const ImportItem({super.key});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => MenuItem(
+        icon: Icons.add_circle_rounded,
+        text: 'Import',
         onTap: () => cubits.welcome.update(
           active: true,
           allowScreenshot: false,
           child: const ImportPage(),
         ),
-        child: Container(
-            height: screen.menu.itemHeight,
-            width: screen.width,
-            color: Colors.transparent,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              const Icon(Icons.add_circle_rounded, color: Colors.white),
-              const SizedBox(width: 16),
-              Text('Import', style: AppText.h2.copyWith(color: Colors.white)),
-            ])),
       );
 }
 
@@ -133,25 +112,20 @@ class WalletsItem extends StatelessWidget {
   const WalletsItem({super.key});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => MenuItem(
+        icon: Icons.wallet_rounded,
+        text: 'Wallets',
         onTap: () => cubits.welcome.update(
-            active: true,
-            allowScreenshot: false,
-            child: LoginNative(
-                onFailure: () => cubits.welcome.update(
-                      active: false,
-                      child: const SizedBox.shrink(),
-                    ),
-                child: const WalletsPage())),
-        child: Container(
-            height: screen.menu.itemHeight,
-            width: screen.width,
-            color: Colors.transparent,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              const Icon(Icons.wallet_rounded, color: Colors.white),
-              const SizedBox(width: 16),
-              Text('Wallets', style: AppText.h2.copyWith(color: Colors.white)),
-            ])),
+          active: true,
+          allowScreenshot: false,
+          child: LoginNative(
+            onFailure: () => cubits.welcome.update(
+              active: false,
+              child: const SizedBox.shrink(),
+            ),
+            child: const WalletsPage(),
+          ),
+        ),
       );
 }
 
@@ -159,22 +133,14 @@ class AddressesItem extends StatelessWidget {
   const AddressesItem({super.key});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => MenuItem(
+        icon: Icons.menu_open_rounded,
+        text: 'Addresses',
         onTap: () => cubits.welcome.update(
           active: true,
           allowScreenshot: false,
           child: const AddressesPage(),
         ),
-        child: Container(
-            height: screen.menu.itemHeight,
-            width: screen.width,
-            color: Colors.transparent,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              const Icon(Icons.menu_open_rounded, color: Colors.white),
-              const SizedBox(width: 16),
-              Text('Addresses',
-                  style: AppText.h2.copyWith(color: Colors.white)),
-            ])),
       );
 }
 
@@ -182,24 +148,45 @@ class PairWithChromeItem extends StatelessWidget {
   const PairWithChromeItem({super.key});
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: () => cubits.welcome
-            .update(active: true, child: const PairWithChromePage()),
-        child: Container(
-          height: screen.menu.itemHeight,
-          width: screen.width,
-          color: Colors.transparent,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Icon(Icons.public, color: Colors.white),
-              const SizedBox(width: 16),
-              Text(
-                'Pair with chrome',
-                style: AppText.h2.copyWith(color: Colors.white),
-              ),
-            ],
-          ),
+  Widget build(BuildContext context) => MenuItem(
+        icon: Icons.public,
+        text: 'Pair with chrome',
+        onTap: () => cubits.welcome.update(
+          active: true,
+          child: const PairWithChromePage(),
         ),
       );
+}
+
+class MenuItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final VoidCallback onTap;
+
+  const MenuItem({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: screen.menu.itemHeight,
+        width: screen.width,
+        color: Colors.transparent,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 16),
+            Text(text, style: AppText.h2.copyWith(color: Colors.white)),
+          ],
+        ),
+      ),
+    );
+  }
 }

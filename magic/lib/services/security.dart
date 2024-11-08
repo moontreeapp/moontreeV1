@@ -53,7 +53,7 @@ class SecurityService {
       }
       return authenticated;
     } on PlatformException catch (e) {
-      print(e);
+      see(e);
       return false;
     }
   }

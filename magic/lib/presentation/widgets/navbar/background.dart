@@ -31,7 +31,7 @@ class NavbarBackground extends StatelessWidget {
               height: height,
               alignment: Alignment.topCenter,
               color: color,
-              child: child ?? DragIndicator()),
+              child: child ?? const DragIndicator()),
         ),
       );
 }
@@ -44,7 +44,7 @@ class DragIndicator extends StatelessWidget {
         width: 24,
         color: Colors.transparent,
         alignment: Alignment.topCenter,
-        padding: EdgeInsets.only(top: 12),
+        padding: const EdgeInsets.only(top: 12),
         child: Container(
             height: 4,
             width: 24,
@@ -68,7 +68,7 @@ class DraggableNavbarBackground extends StatefulWidget {
   final Function? maxTopCallback;
 
   const DraggableNavbarBackground({
-    Key? key,
+    super.key,
     this.color = Colors.black,
     this.initialTop,
     this.imageFilter,
@@ -77,7 +77,7 @@ class DraggableNavbarBackground extends StatefulWidget {
     this.minTop,
     this.maxTop,
     this.maxTopCallback,
-  }) : super(key: key);
+  });
 
   @override
   State<DraggableNavbarBackground> createState() =>

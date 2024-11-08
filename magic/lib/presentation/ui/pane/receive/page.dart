@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:magic/presentation/widgets/other/app_button.dart';
+import 'package:magic/services/deep_link.dart';
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +10,6 @@ import 'package:magic/presentation/ui/pane/wallet/page.dart';
 import 'package:magic/utils/log.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:magic/presentation/theme/colors.dart';
-import 'package:magic/presentation/theme/text.dart';
 import 'package:magic/services/services.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -117,57 +118,36 @@ class ReceivePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Expanded(
-                      child: GestureDetector(
-                          onTap: () {
-                            Clipboard.setData(ClipboardData(
-                                text: cubits.receive.state.address));
-                            cubits.toast.flash(
-                                msg: const ToastMessage(
-                                    duration: Duration(seconds: 2),
-                                    title: 'copied',
-                                    text: 'to clipboard'));
-                          },
-                          child: Container(
-                              height: 64,
-                              decoration: ShapeDecoration(
-                                color: AppColors.button,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(28 * 100),
-                                ),
-                              ),
-                              child: Center(
-                                  child: Text(
-                                'COPY',
-                                style: AppText.button1
-                                    .copyWith(color: Colors.white),
-                              ))))),
+                    child: AppButton(
+                      label: 'COPY',
+                      onPressed: () {
+                        Clipboard.setData(
+                            ClipboardData(text: cubits.receive.state.address));
+                        cubits.toast.flash(
+                          msg: const ToastMessage(
+                            duration: Duration(seconds: 2),
+                            title: 'copied',
+                            text: 'to clipboard',
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                   if (!Platform.isIOS) const SizedBox(width: 16),
                   if (!Platform.isIOS)
                     Expanded(
-                        child: GestureDetector(
-                      onTap: () {
-                        screenshotController.capture().then((image) {
-                          see('image: ${image?.length}');
-                          if (image != null) {
-                            shareQRCode(image);
-                          }
-                        });
-                      },
-                      child: Container(
-                          height: 64,
-                          decoration: ShapeDecoration(
-                            color: AppColors.button,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(28 * 100),
-                            ),
-                          ),
-                          child: Center(
-                              child: Text(
-                            'SHARE',
-                            style:
-                                AppText.button1.copyWith(color: Colors.white),
-                          ))),
-                    )),
+                      child: AppButton(
+                        label: 'SHARE',
+                        onPressed: () {
+                          screenshotController.capture().then((image) {
+                            see('image: ${image?.length}');
+                            if (image != null) {
+                              shareQRCode(image);
+                            }
+                          });
+                        },
+                      ),
+                    ),
                 ],
               )
             ]));
@@ -178,11 +158,16 @@ class ReceivePage extends StatelessWidget {
     final file = File('${tempDir.path}/qr.png');
     await file.writeAsBytes(image);
 
-    await Share.shareXFiles([
-      XFile(
-        file.path,
-        name: 'qr.png',
-      )
-    ]);
+    await Share.shareXFiles(
+      [
+        XFile(
+          file.path,
+          name: 'qr.png',
+        ),
+      ],
+      text: DeepLinkService.generateReceiveDeepLink(
+        address: cubits.receive.state.address,
+      ),
+    );
   }
 }

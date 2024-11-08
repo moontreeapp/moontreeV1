@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magic/presentation/ui/welcome/lock.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
+import 'package:magic/services/deep_link.dart';
+import 'package:magic/utils/log.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/presentation/theme/colors.dart';
@@ -69,7 +71,7 @@ Future<void> main() async {
     await precacheSvgPicture(LogoIcons.appLogo);
     runApp(const MagicApp());
   } catch (e) {
-    print('Initialization error: $e');
+    see('Initialization error: $e');
     runApp(MagicAppDebug(error: '$e'));
   }
 }
@@ -174,13 +176,13 @@ Future<void> _clearAuthAndLoadKeys(BuildContext context) async {
   ////    cubits.keys.master.derivationWallets.last.roots(Blockchain.evrmoreMain));
   ////[xpub6EyL2KHeobgPS891ygwWVrZUAqRArjUk5Fs4zxQ9d6Yy1GMF78AULHZaRUNmg6BZzhPj7P6Qc6SXUGc4YHMV8A9wFcxw19tmNxnF1XfMHWZ, xpub6EyL2KHeobgPSohWN2j4xPiX5PFJvnbAi64u2yA3qDQTBcBd8jdN21jmvVsuTL8HDmyCN6cf7qaV3VbBR1DQeS7JFiq6JzRw6dToyLA4Qqq]
   ////[xpub6Djoyq41s3QGoGefbJCEkrdfHquk5315tdeuQMr21QxA3jSzGAxxLpqPfAz22RmmofBEx98MJf27KYyT8NN31SS6EzsiDxbYNDsv6hLBSfD, xpub6Djoyq41s3QGrA8YgAaZgdS3ALyG2vij5Fp1XSM9JRdx4kCrhWLtrifW67ncQhgWMmUQxRto3SS7zktvL81SxWwBtR63b9tLpDvc7ddrhHe]
-  print('before ensure connected');
+  see('before ensure connected');
   subscription.ensureConnected().then((_) {
     //  //subscription.setupSubscriptions(cubits.keys.master);
     maestro.activateHome();
   });
 
-  print('after ensure connected');
+  see('after ensure connected');
 }
 
 class MaestroLayer extends StatefulWidget {
@@ -221,6 +223,7 @@ class _MaestroLayerState extends State<MaestroLayer> {
             ),
           ),
         );
+        DeepLinkService.initDeepLink();
         //return Platform.isIOS ? SafeArea(child: scaffold) : scaffold;
         return scaffold;
       },

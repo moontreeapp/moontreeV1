@@ -41,45 +41,69 @@ class HodingDetailPage extends StatelessWidget {
 class AnimatedCoinSpec extends StatelessWidget {
   const AnimatedCoinSpec({super.key});
 
-  Widget assetIcon() => Container(
-        width: screen.width,
-        alignment: Alignment.center,
-        child: cubits.holding.state.holding.isCurrency
-            ? CurrencyIdenticon(
-                holding: cubits.holding.state.holding,
-                height: screen.iconHuge + 12,
-                width: screen.iconHuge + 12,
-              )
-            : cubits.holding.state.holding.weHaveAdminOrMain
-                ? () {
-                    final pair = cubits.wallet
-                        .mainAndAdminOf(cubits.holding.state.holding);
-                    return TokenToggle(
-                      height: screen.iconHuge + 12,
-                      width: screen.iconHuge + 12,
-                      style: AppText.identiconHuge,
-                      mainHolding: pair.main!,
-                      adminHolding: pair.admin!,
-                    );
-                  }()
-                : AssetIcons.hasCustomIcon(cubits.holding.state.holding.name,
-                        cubits.holding.state.holding.blockchain)
-                    ? AssetIdenticon(
-                        holding: cubits.holding.state.holding,
-                        height: screen.iconHuge + 12,
-                        width: screen.iconHuge + 12,
-                        blockchain: cubits.holding.state.holding.blockchain,
-                      )
-                    : SimpleIdenticon(
-                        letter:
-                            cubits.holding.state.holding.assetPathChildNFT[0],
-                        height: screen.iconHuge + 12,
-                        width: screen.iconHuge + 12,
-                        style: AppText.identiconHuge,
-                        admin: cubits.holding.state.holding.isAdmin,
-                        blockchain: cubits.holding.state.holding.blockchain,
-                      ),
-      );
+  Widget assetIcon() {
+    final holding = cubits.holding.state.holding;
+    final blockchain = holding.blockchain;
+    final heightWidth = screen.iconHuge + 12;
+    return Container(
+      width: screen.width,
+      alignment: Alignment.center,
+      child: cubits.holding.state.section == HoldingSection.pool
+          ? SimpleIdenticon(
+              letter: '',
+              height: heightWidth,
+              width: heightWidth,
+              style: AppText.identiconHuge,
+              admin: holding.isAdmin,
+              blockchain: blockchain,
+              showAppIcon: true,
+            )
+          : holding.asset.name.toLowerCase() == 'satori'
+              ? SimpleIdenticon(
+                  letter: '',
+                  height: heightWidth,
+                  width: heightWidth,
+                  style: AppText.identiconHuge,
+                  admin: holding.isAdmin,
+                  blockchain: blockchain,
+                  showBlockchainIcon: true,
+                )
+              : holding.isCurrency
+                  ? CurrencyIdenticon(
+                      holding: holding,
+                      height: heightWidth,
+                      width: heightWidth,
+                    )
+                  : holding.weHaveAdminOrMain
+                      ? () {
+                          final pair = cubits.wallet
+                              .mainAndAdminOf(cubits.holding.state.holding);
+                          return TokenToggle(
+                            height: heightWidth,
+                            width: heightWidth,
+                            style: AppText.identiconHuge,
+                            mainHolding: pair.main!,
+                            adminHolding: pair.admin!,
+                          );
+                        }()
+                      : AssetIcons.hasCustomIcon(holding.name, blockchain)
+                          ? AssetIdenticon(
+                              holding: holding,
+                              height: heightWidth,
+                              width: heightWidth,
+                              blockchain: blockchain,
+                            )
+                          : SimpleIdenticon(
+                              letter: cubits
+                                  .holding.state.holding.assetPathChildNFT[0],
+                              height: heightWidth,
+                              width: heightWidth,
+                              style: AppText.identiconHuge,
+                              admin: holding.isAdmin,
+                              blockchain: blockchain,
+                            ),
+    );
+  }
 
   Widget assetValues({
     String? whole,
@@ -144,61 +168,33 @@ class AnimatedCoinSpec extends StatelessWidget {
                         .sats
                         .value >
                     0))
-          GestureDetector(
-              onTap:
-                  //!['\$ -', '\$ 0.00'].contains(cubits.holding.state.usd)
-                  cubits.holding.state.holding.sats.value > 0
-                      ? () => maestro.activateSend()
-                      : () => cubits.toast.flash(
+          assetButton(
+            onTap: //!['\$ -', '\$ 0.00'].contains(cubits.holding.state.usd)
+                cubits.holding.state.holding.sats.value > 0
+                    ? () => maestro.activateSend()
+                    : () => cubits.toast.flash(
                           msg: const ToastMessage(
-                              duration: Duration(seconds: 2),
-                              title: 'Empty',
-                              text: 'unable to send')),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: screen.iconLarge + 12,
-                      width: screen.iconLarge + 12,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.buttonLight,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: SvgPicture.asset(
-                        '${TransactionIcons.base}/outgoing-raw.${TransactionIcons.ext}',
-                        alignment: Alignment.center,
-                        colorFilter: const ColorFilter.mode(
-                            AppColors.white87, BlendMode.srcIn),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text('Send', style: AppText.labelHolding),
-                  ])),
+                            duration: Duration(seconds: 2),
+                            title: 'Empty',
+                            text: 'unable to send',
+                          ),
+                        ),
+            icon: 'outgoing-raw',
+            label: 'Send',
+          ),
         //SizedBox(width: screen.canvas.wSpace),
-        GestureDetector(
-            onTap: () => maestro
-                .activateReceive(cubits.holding.state.holding.blockchain),
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(
-                height: screen.iconLarge + 12,
-                width: screen.iconLarge + 12,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.buttonLight,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                child: SvgPicture.asset(
-                  '${TransactionIcons.base}/incoming-raw.${TransactionIcons.ext}',
-                  alignment: Alignment.center,
-                  colorFilter: const ColorFilter.mode(
-                      AppColors.white87, BlendMode.srcIn),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text('Receive', style: AppText.labelHolding),
-            ])),
+        assetButton(
+          onTap: () =>
+              maestro.activateReceive(cubits.holding.state.holding.blockchain),
+          icon: 'incoming-raw',
+          label: 'Receive',
+        ),
+        if (cubits.holding.state.holding.asset.name.toLowerCase() == 'satori')
+          assetButton(
+            onTap: () => maestro.activatePoolOnHolding(),
+            icon: 'pool',
+            label: 'Pool',
+          ),
         //SizedBox(width: screen.canvas.wSpace),
         //if (DateTime.now().isAfter(DateTime(2024, 7, 15)))
         //GestureDetector(
@@ -223,6 +219,38 @@ class AnimatedCoinSpec extends StatelessWidget {
         //    ])),
         const SizedBox.shrink(),
       ]));
+
+  GestureDetector assetButton({
+    required void Function()? onTap,
+    required String icon,
+    required String label,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            height: screen.iconLarge + 12,
+            width: screen.iconLarge + 12,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.buttonLight,
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: SvgPicture.asset(
+              '${TransactionIcons.base}/$icon.${TransactionIcons.ext}',
+              alignment: Alignment.center,
+              colorFilter:
+                  const ColorFilter.mode(AppColors.white87, BlendMode.srcIn),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(label, style: AppText.labelHolding),
+        ],
+      ),
+    );
+  }
 
   /// AnimatedPositions solution:
   @override
@@ -264,6 +292,12 @@ class AnimatedCoinSpec extends StatelessWidget {
               ? (state.holding.blockchain.name)
               : state.holding.name;
           //: '${state.holding.name}${'\non ${state.holding.blockchain.name}'}';
+        } else if (state.section == HoldingSection.pool) {
+          iconTop = screen.canvas.midHeight / 2 - (screen.iconHuge * 1.67);
+          valueTop = (screen.canvas.midHeight / 2 - (screen.iconHuge * 1.67)) +
+              screen.iconHuge +
+              scrunchedSpacing;
+          overrideSubtitle = 'Fee: 20%';
         } else if (state.section == HoldingSection.swap) {
           iconTop = screen.canvas.midHeight / 2 - (screen.iconHuge * 1.67);
           valueTop = (screen.canvas.midHeight / 2 - (screen.iconHuge * 1.67)) +

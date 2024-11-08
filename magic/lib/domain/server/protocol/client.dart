@@ -34,7 +34,7 @@ import 'dart:io' as _i17;
 import 'protocol.dart' as _i18;
 
 class _EndpointAddresses extends _i1.EndpointRef {
-  _EndpointAddresses(_i1.EndpointCaller caller) : super(caller);
+  _EndpointAddresses(super.caller);
 
   @override
   String get name => 'addresses';
@@ -54,7 +54,7 @@ class _EndpointAddresses extends _i1.EndpointRef {
 }
 
 class _EndpointMetadata extends _i1.EndpointRef {
-  _EndpointMetadata(_i1.EndpointCaller caller) : super(caller);
+  _EndpointMetadata(super.caller);
 
   @override
   String get name => 'metadata';
@@ -83,7 +83,7 @@ class _EndpointMetadata extends _i1.EndpointRef {
 }
 
 class _EndpointCreateAsset extends _i1.EndpointRef {
-  _EndpointCreateAsset(_i1.EndpointCaller caller) : super(caller);
+  _EndpointCreateAsset(super.caller);
 
   @override
   String get name => 'createAsset';
@@ -103,7 +103,7 @@ class _EndpointCreateAsset extends _i1.EndpointRef {
 }
 
 class _EndpointReissueAsset extends _i1.EndpointRef {
-  _EndpointReissueAsset(_i1.EndpointCaller caller) : super(caller);
+  _EndpointReissueAsset(super.caller);
 
   @override
   String get name => 'reissueAsset';
@@ -123,7 +123,7 @@ class _EndpointReissueAsset extends _i1.EndpointRef {
 }
 
 class _EndpointFreezeRestrictedAsset extends _i1.EndpointRef {
-  _EndpointFreezeRestrictedAsset(_i1.EndpointCaller caller) : super(caller);
+  _EndpointFreezeRestrictedAsset(super.caller);
 
   @override
   String get name => 'freezeRestrictedAsset';
@@ -143,7 +143,7 @@ class _EndpointFreezeRestrictedAsset extends _i1.EndpointRef {
 }
 
 class _EndpointTagAddress extends _i1.EndpointRef {
-  _EndpointTagAddress(_i1.EndpointCaller caller) : super(caller);
+  _EndpointTagAddress(super.caller);
 
   @override
   String get name => 'tagAddress';
@@ -163,7 +163,7 @@ class _EndpointTagAddress extends _i1.EndpointRef {
 }
 
 class _EndpointBalances extends _i1.EndpointRef {
-  _EndpointBalances(_i1.EndpointCaller caller) : super(caller);
+  _EndpointBalances(super.caller);
 
   @override
   String get name => 'balances';
@@ -185,7 +185,7 @@ class _EndpointBalances extends _i1.EndpointRef {
 }
 
 class _EndpointCirculatingSats extends _i1.EndpointRef {
-  _EndpointCirculatingSats(_i1.EndpointCaller caller) : super(caller);
+  _EndpointCirculatingSats(super.caller);
 
   @override
   String get name => 'circulatingSats';
@@ -199,7 +199,7 @@ class _EndpointCirculatingSats extends _i1.EndpointRef {
 }
 
 class _EndpointConsent extends _i1.EndpointRef {
-  _EndpointConsent(_i1.EndpointCaller caller) : super(caller);
+  _EndpointConsent(super.caller);
 
   @override
   String get name => 'consent';
@@ -219,7 +219,7 @@ class _EndpointConsent extends _i1.EndpointRef {
 }
 
 class _EndpointHasGiven extends _i1.EndpointRef {
-  _EndpointHasGiven(_i1.EndpointCaller caller) : super(caller);
+  _EndpointHasGiven(super.caller);
 
   @override
   String get name => 'hasGiven';
@@ -239,7 +239,7 @@ class _EndpointHasGiven extends _i1.EndpointRef {
 }
 
 class _EndpointDocument extends _i1.EndpointRef {
-  _EndpointDocument(_i1.EndpointCaller caller) : super(caller);
+  _EndpointDocument(super.caller);
 
   @override
   String get name => 'document';
@@ -261,7 +261,7 @@ class _EndpointDocument extends _i1.EndpointRef {
 }
 
 class _EndpointExample extends _i1.EndpointRef {
-  _EndpointExample(_i1.EndpointCaller caller) : super(caller);
+  _EndpointExample(super.caller);
 
   @override
   String get name => 'example';
@@ -274,7 +274,7 @@ class _EndpointExample extends _i1.EndpointRef {
 }
 
 class _EndpointMempoolTransactions extends _i1.EndpointRef {
-  _EndpointMempoolTransactions(_i1.EndpointCaller caller) : super(caller);
+  _EndpointMempoolTransactions(super.caller);
 
   @override
   String get name => 'mempoolTransactions';
@@ -300,7 +300,7 @@ class _EndpointMempoolTransactions extends _i1.EndpointRef {
 }
 
 class _EndpointBroadcastTransaction extends _i1.EndpointRef {
-  _EndpointBroadcastTransaction(_i1.EndpointCaller caller) : super(caller);
+  _EndpointBroadcastTransaction(super.caller);
 
   @override
   String get name => 'broadcastTransaction';
@@ -320,14 +320,14 @@ class _EndpointBroadcastTransaction extends _i1.EndpointRef {
 }
 
 class _EndpointSubscription extends _i1.EndpointRef {
-  _EndpointSubscription(_i1.EndpointCaller caller) : super(caller);
+  _EndpointSubscription(super.caller);
 
   @override
   String get name => 'subscription';
 }
 
 class _EndpointTransactionDetails extends _i1.EndpointRef {
-  _EndpointTransactionDetails(_i1.EndpointCaller caller) : super(caller);
+  _EndpointTransactionDetails(super.caller);
 
   @override
   String get name => 'transactionDetails';
@@ -347,7 +347,7 @@ class _EndpointTransactionDetails extends _i1.EndpointRef {
 }
 
 class _EndpointTransactions extends _i1.EndpointRef {
-  _EndpointTransactions(_i1.EndpointCaller caller) : super(caller);
+  _EndpointTransactions(super.caller);
 
   @override
   String get name => 'transactions';
@@ -373,7 +373,7 @@ class _EndpointTransactions extends _i1.EndpointRef {
 }
 
 class _EndpointUnsignedTransaction extends _i1.EndpointRef {
-  _EndpointUnsignedTransaction(_i1.EndpointCaller caller) : super(caller);
+  _EndpointUnsignedTransaction(super.caller);
 
   @override
   String get name => 'unsignedTransaction';

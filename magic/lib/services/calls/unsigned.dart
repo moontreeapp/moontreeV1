@@ -1,12 +1,10 @@
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/money/security.dart';
-import 'package:magic/domain/concepts/transaction.dart';
 import 'package:magic/domain/server/serverv2_client.dart';
 import 'package:magic/domain/server/wrappers/unsigned_tx_result.dart';
 import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/services/calls/server.dart';
 import 'package:moontree_utils/moontree_utils.dart';
-import 'package:wallet_utils/wallet_utils.dart';
 
 class UnsignedTransactionCall extends ServerCall {
   late List<DerivationWallet> derivationWallets;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:magic/cubits/canvas/menu/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/concepts/transaction.dart';
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/presentation/widgets/assets/amounts.dart';
+import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -89,34 +89,14 @@ class TransactionPage extends StatelessWidget {
                           )),
                 ])
               ]),
-              ElevatedButton(
-                  onPressed: () => launchUrl(Uri.parse(
-                      display.blockchain?.explorerTxUrl(display.hash) ?? '')),
-                  style: ButtonStyle(
-                    backgroundColor:
-                        WidgetStateProperty.all<Color>(AppColors.front),
-                    foregroundColor:
-                        WidgetStateProperty.all<Color>(AppColors.front),
-                    shadowColor:
-                        WidgetStateProperty.all<Color>(Colors.transparent),
-                    elevation: WidgetStateProperty.all<double>(0),
-                    overlayColor: WidgetStateProperty.all<Color>(
-                        AppColors.white.withOpacity(0.12)),
-                  ),
-                  child: Container(
-                      height: 64,
-                      decoration: ShapeDecoration(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28 * 100),
-                        ),
-                      ),
-                      child: Center(
-                          child: Text(
-                        'VIEW DETAILS',
-                        style: AppText.button1.copyWith(
-                            color: AppColors.white38,
-                            fontWeight: FontWeight.bold),
-                      )))),
+              AppButton(
+                onPressed: () => launchUrl(Uri.parse(
+                    display.blockchain?.explorerTxUrl(display.hash) ?? '')),
+                label: 'VIEW DETAILS',
+                buttonColor: AppColors.front,
+                textColor: AppColors.white38,
+                fontWeight: FontWeight.bold,
+              ),
               //GestureDetector(
               //    onTap: () => launchUrl(Uri.parse(
               //        display.blockchain?.explorerTxUrl(display.hash) ?? '')),

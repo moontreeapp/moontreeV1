@@ -77,7 +77,7 @@ class Birthday {
     }
   }
 
-  List<String> get parts => text.split(new RegExp(r'[\/.-]'));
+  List<String> get parts => text.split(RegExp(r'[\/.-]'));
 
   bool get _isLeapYear => year != null && leapYear(year!);
   int get _maxDay {

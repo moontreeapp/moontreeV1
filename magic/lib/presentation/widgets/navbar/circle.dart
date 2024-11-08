@@ -84,7 +84,7 @@ class CircleIcon extends StatelessWidget {
         child: Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(100)),
-          child: icon != null ? icon : child,
+          child: icon ?? child,
         ),
       );
 }
@@ -123,16 +123,16 @@ class CircleShadow extends StatelessWidget {
   final Shadow shadow;
 
   const CircleShadow({
-    Key? key,
+    super.key,
     required this.size,
     required this.shadow,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: CircleShadowPainter(shadow: shadow),
-      child: Container(
+      child: SizedBox(
         width: size,
         height: size,
       ),

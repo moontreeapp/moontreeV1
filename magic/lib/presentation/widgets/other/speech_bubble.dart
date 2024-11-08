@@ -17,7 +17,7 @@ class SpeechBubble extends StatelessWidget {
   /// Creates a widget that emulates a speech bubble.
   /// Could be used for a tooltip, or as a pop-up notification, etc.
   const SpeechBubble({
-    Key? key,
+    super.key,
     required this.child,
     this.nipLocation = NipLocation.top,
     this.color = Colors.white,
@@ -30,7 +30,7 @@ class SpeechBubble extends StatelessWidget {
     this.nipOffCenter = 0.0,
     this.nipBorderRadius = 0,
     this.offset = Offset.zero,
-  }) : super(key: key);
+  });
 
   /// The [child] contained by the [SpeechBubble]
   final Widget child;
@@ -72,6 +72,7 @@ class SpeechBubble extends StatelessWidget {
 
   final Offset offset;
 
+  @override
   Widget build(BuildContext context) {
     Offset? nipOffset;
     AlignmentGeometry? alignment;

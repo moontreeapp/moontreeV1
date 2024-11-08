@@ -11,7 +11,6 @@ import 'package:magic/domain/concepts/numbers/coin.dart';
 import 'package:magic/domain/concepts/numbers/fiat.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/sats.dart';
-import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/domain/utils/extensions/list.dart';
 import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/utils/range.dart';

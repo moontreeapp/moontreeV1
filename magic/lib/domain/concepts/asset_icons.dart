@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:magic/domain/blockchain/blockchain.dart';
+import 'package:magic/utils/log.dart';
 
 class AssetIcons {
   static const String _baseLogoPath = 'assets/asset_logos/';
@@ -41,6 +41,7 @@ class AssetIcons {
       "exchange": "",
       "fiat_pair": ""
     },
+    // ignore: equal_keys_in_map
     "CATE": {
       "blockchain_name": "Ravencoin",
       "logo_path": "cate.png",
@@ -69,7 +70,7 @@ class AssetIcons {
   };
 
   static bool hasCustomIcon(String assetName, Blockchain blockchain) {
-    print('Checking for custom icon: $assetName on ${blockchain.name}');
+    see('Checking for custom icon: $assetName on ${blockchain.name}');
     final info = _assetInfo[assetName];
     return info != null && info['blockchain_name'] == blockchain.name;
   }

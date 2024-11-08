@@ -69,7 +69,8 @@ class TransparentClipper extends CustomClipper<Path> {
 
   @override
   Path getClip(Size size) => Path()
-    ..addRect(Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)))
+    ..addRect(
+        Rect.fromPoints(const Offset(0, 0), Offset(size.width, size.height)))
     ..addOval(Rect.fromCircle(
         center: Offset(x ?? size.width / 2, y ?? size.height / 2),
         radius: radius))

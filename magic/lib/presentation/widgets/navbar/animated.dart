@@ -75,8 +75,7 @@ class AnimatedNavbarBackgroundState extends State<AnimatedNavbarBackground>
 }
 
 class ListTween extends Tween<List<double>> {
-  ListTween({List<double>? begin, List<double>? end})
-      : super(begin: begin, end: end);
+  ListTween({super.begin, super.end});
 
   @override
   List<double> lerp(double t) {

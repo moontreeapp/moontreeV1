@@ -44,10 +44,10 @@ class SlideTo extends StatefulWidget {
             'must provide a start and end position');
 
   @override
-  _SlideToState createState() => _SlideToState();
+  SlideToState createState() => SlideToState();
 }
 
-class _SlideToState extends State<SlideTo> with SingleTickerProviderStateMixin {
+class SlideToState extends State<SlideTo> with SingleTickerProviderStateMixin {
 //class _SlideToState extends State<SlideTo> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -144,10 +144,10 @@ class SlideOutIn extends StatefulWidget {
   });
 
   @override
-  _SlideOutInState createState() => _SlideOutInState();
+  SlideOutInState createState() => SlideOutInState();
 }
 
-class _SlideOutInState extends State<SlideOutIn>
+class SlideOutInState extends State<SlideOutIn>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<Offset> _animationRight;
@@ -416,6 +416,7 @@ class SlideUp extends StatefulWidget {
   final double end;
   final Function? then;
   const SlideUp({
+    super.key,
     required this.child,
     this.duration = animation.slideDuration,
     this.enter = true,
@@ -427,10 +428,10 @@ class SlideUp extends StatefulWidget {
   });
 
   @override
-  _SlideUpState createState() => _SlideUpState();
+  SlideUpState createState() => SlideUpState();
 }
 
-class _SlideUpState extends State<SlideUp> with SingleTickerProviderStateMixin {
+class SlideUpState extends State<SlideUp> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late Animation<Offset> _animationUp;
 
@@ -577,6 +578,7 @@ class SlideByController extends StatefulWidget {
   final VoidCallback? onMinimumReached;
 
   const SlideByController({
+    super.key,
     this.invert = false,
     this.initialPosition = 0,
     this.min = 0,
@@ -587,10 +589,10 @@ class SlideByController extends StatefulWidget {
   });
 
   @override
-  _SlideByControllerState createState() => _SlideByControllerState();
+  SlideByControllerState createState() => SlideByControllerState();
 }
 
-class _SlideByControllerState extends State<SlideByController> {
+class SlideByControllerState extends State<SlideByController> {
   late double initialOffset;
   late double currentOffset;
   late double priorOffset;

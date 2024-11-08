@@ -13,10 +13,10 @@ class RotationAnimation extends StatefulWidget {
   });
 
   @override
-  _RotationAnimation createState() => _RotationAnimation();
+  RotationAnimationState createState() => RotationAnimationState();
 }
 
-class _RotationAnimation extends State<RotationAnimation>
+class RotationAnimationState extends State<RotationAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _rotationAnimation;

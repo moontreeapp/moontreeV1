@@ -13,11 +13,13 @@ import 'package:magic/presentation/ui/pane/send/scanner.dart';
 import 'package:magic/presentation/ui/pane/send/confirm.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/animations/fading.dart';
+import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'package:magic/utils/log.dart';
 
 class SendPage extends StatelessWidget {
   const SendPage({super.key});
+
   @override
   Widget build(BuildContext context) => BlocBuilder<SendCubit, SendState>(
       buildWhen: (SendState prior, SendState current) =>
@@ -52,6 +54,7 @@ class SendPage extends StatelessWidget {
 
 class SendContent extends StatefulWidget {
   const SendContent({super.key});
+
   @override
   SendContentState createState() => SendContentState();
 }
@@ -73,58 +76,58 @@ class SendContentState extends State<SendContent> {
   }
 
 // ignore: slash_for_doc_comments
-/** validation
- * ETJ8zPcJiBYBxCdiiHt37xCfXRKVRuBsp7
-  String _asDoubleString(double x) {
-    if (x.toString().endsWith('.0')) {
+  /** validation
+   * ETJ8zPcJiBYBxCdiiHt37xCfXRKVRuBsp7
+      String _asDoubleString(double x) {
+      if (x.toString().endsWith('.0')) {
       return x.toString().replaceAll('.0', '');
-    }
-    return x.toString();
-  }
+      }
+      return x.toString();
+      }
 
-    bool _validateDivisibility([String? value]) =>
+      bool _validateDivisibility([String? value]) =>
       (components.cubits.simpleSendForm.state.metadataView?.divisibility ??
-          8) >=
+      8) >=
       ((value ?? sendAmount.text).contains('.')
-          ? (value ?? sendAmount.text).split('.').last.length
-          : 0);
-           bool _holdingValidation(SimpleSendFormState state) {
-    final quantity = sendAmount.textWithoutCommas;
-    if (_asDouble(quantity) == 0.0) {
+      ? (value ?? sendAmount.text).split('.').last.length
+      : 0);
+      bool _holdingValidation(SimpleSendFormState state) {
+      final quantity = sendAmount.textWithoutCommas;
+      if (_asDouble(quantity) == 0.0) {
       return false;
-    }
-    if (holdingBalance.security.isCoin) {
+      }
+      if (holdingBalance.security.isCoin) {
       // we have enough coin for the send and minimum fee estimate
       // actaully don't do this because we can send all.
       if (holdingBalance.amount == double.parse(quantity)) {
-        return true;
+      return true;
       }
       // if not sending all:
       return holdingBalance.amount > double.parse(quantity) + 0.0021;
-    } else {
+      } else {
       final BalanceView? holdingView =
-          components.cubits.holdingsView.holdingsViewFor(Current.coin.symbol);
+      components.cubits.holdingsView.holdingsViewFor(Current.coin.symbol);
       // we have enough asset for the send and enough coin for minimum fee
       return holdingBalance.amount >= double.parse(quantity) &&
-          holdingView!.satsConfirmed + holdingView.satsUnconfirmed > 210000;
-    }
-    //return (state.security.balance?.amount ?? 0) >=
-    //    double.parse(sendAmount.textWithoutCommas);
-  }
-    final bool vAddress = sendAddress.text != '' && _validateAddress();
-  bool _validateAddress([String? address]) {
-    address ??= sendAddress.text;
-    return address == '' ||
-        (pros.settings.chain == Chain.ravencoin
-            ? pros.settings.net == Net.main
-                ? address.isAddressRVN
-                : address.isAddressRVNt
-            : pros.settings.net == Net.main
-                ? address.isAddressEVR
-                : address.isAddressEVRt);
-  }
+      holdingView!.satsConfirmed + holdingView.satsUnconfirmed > 210000;
+      }
+      //return (state.security.balance?.amount ?? 0) >=
+      //    double.parse(sendAmount.textWithoutCommas);
+      }
+      final bool vAddress = sendAddress.text != '' && _validateAddress();
+      bool _validateAddress([String? address]) {
+      address ??= sendAddress.text;
+      return address == '' ||
+      (pros.settings.chain == Chain.ravencoin
+      ? pros.settings.net == Net.main
+      ? address.isAddressRVN
+      : address.isAddressRVNt
+      : pros.settings.net == Net.main
+      ? address.isAddressEVR
+      : address.isAddressEVRt);
+      }
 
- */
+   */
 
   bool validateVisibleForm() =>
       cubits.send.validateAddress(addressText.text) &&
@@ -220,7 +223,7 @@ class SendContentState extends State<SendContent> {
                             amountText.text = fiatAmount.toString();
                           });
                         } catch (e) {
-                          print(e);
+                          see(e);
                         }
                       } else {
                         amountText.text =
@@ -395,30 +398,17 @@ class SendContentState extends State<SendContent> {
                 ),
               );
             }
-            return GestureDetector(
-              onTap: () => cubits.send.validateForm() && validateVisibleForm()
-                  ? cubits.send.send()
-                  : cubits.toast.flash(
-                      msg: const ToastMessage(
-                      title: 'Unable to Continue:',
-                      text: 'Invalid form',
-                    )),
-              child: Container(
-                height: 64,
-                decoration: ShapeDecoration(
-                  color: AppColors.button,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28 * 100),
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    'PREVIEW',
-                    style: AppText.button1
-                        .copyWith(fontSize: 16, color: Colors.white),
-                  ),
-                ),
-              ),
+            return AppButton(
+              onPressed: () =>
+                  cubits.send.validateForm() && validateVisibleForm()
+                      ? cubits.send.send()
+                      : cubits.toast.flash(
+                          msg: const ToastMessage(
+                            title: 'Unable to Continue:',
+                            text: 'Invalid form',
+                          ),
+                        ),
+              label: 'PREVIEW',
             );
           },
         ),
@@ -433,8 +423,8 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final Widget? suffixIcon;
   final TextInputAction? textInputAction;
-
   final void Function(String)? onChanged;
+
   const CustomTextField({
     super.key,
     this.controller,

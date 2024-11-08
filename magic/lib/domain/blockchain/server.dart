@@ -194,7 +194,7 @@ class OPReturnVoutData extends VoutData {
 }
 
 abstract class AssetTagData extends VoutData {
-  const AssetTagData(VoutDataType type) : super(type);
+  const AssetTagData(super.type);
 }
 
 class H160Freeze extends AssetTagData {
@@ -246,7 +246,7 @@ class GlobalFreeze extends AssetTagData {
 }
 
 abstract class AssetData extends VoutData {
-  const AssetData(VoutDataType type) : super(type);
+  const AssetData(super.type);
 }
 
 class AssetAmount extends AssetData {

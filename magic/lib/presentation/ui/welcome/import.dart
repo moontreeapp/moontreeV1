@@ -3,6 +3,7 @@ import 'package:magic/cubits/cubit.dart';
 import 'package:magic/domain/blockchain/mnemonic.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/utils/animation.dart';
+import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'dart:io'; // Add this import
 
@@ -247,30 +248,11 @@ class ImportPageState extends State<ImportPage> {
                   Padding(
                     padding:
                         const EdgeInsets.only(left: 16, right: 16, bottom: 32),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 64,
-                      child: ElevatedButton(
-                        focusNode: submitFocus,
-                        onPressed: lifecycle.submitEnabled ? submit : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: lifecycle.submitEnabled
-                              ? AppColors.button
-                              : Colors.grey[300],
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28 * 100),
-                          ),
-                        ),
-                        child: Text(
-                          lifecycle.submitText,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                    child: AppButton(
+                      onPressed: submit,
+                      label: lifecycle.submitText,
+                      isDisabled: !lifecycle.submitEnabled,
+                      fontSize: 18,
                     ),
                   ),
                 ],

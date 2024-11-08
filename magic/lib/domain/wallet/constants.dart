@@ -7,7 +7,7 @@ enum ImportFormat {
   jsonMt, // unused
   mnemonic,
   encryptedBip38, //unused
-  WIF,
+  wif,
   seed, // unused
   privateKey,
   masterKey,

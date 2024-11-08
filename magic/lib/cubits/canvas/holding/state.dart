@@ -5,6 +5,7 @@ enum HoldingSection {
   send,
   receive,
   swap,
+  pool,
   transaction;
 }
 

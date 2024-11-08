@@ -1,6 +1,8 @@
 /// a service to hit the serverv2 transactions endpoints: mempool and confirmed
 /// compiles info to be sent to the endpoint, gets values for front end
 /// rough draft:
+library;
+
 /*
 */
 //import 'package:client_back/consent/consent_client.dart';

@@ -1,4 +1,6 @@
 /// ported from https://github.com/validatorjs/validator.js/blob/master/src/lib/isEmail.js
+library;
+
 /*
 import 'package:string_validator/string_validator.dart';
 import 'package:collection/collection.dart';

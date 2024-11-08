@@ -559,6 +559,40 @@ class Maestro {
     locked = false;
   }
 
+  Future<void> activatePoolOnHolding() async {
+    if (locked) {
+      return;
+    } else {
+      locked = true;
+    }
+    cubits.app.animating = true;
+    cubits.pane.setOnBottomReached(null);
+    cubits.ignore.update(active: true);
+    cubits.fade.update(fade: FadeEvent.fadeOut);
+    cubits.navbar.update(active: false);
+    cubits.appbar.update(
+      leading: AppbarLeading.back,
+      title: 'Magic Pool',
+      clearTitleChild: true,
+      onLead: activateHistory,
+      onTitle: cubits.appbar.none,
+    );
+    cubits.menu.update(active: false);
+    cubits.holding.update(active: true, section: HoldingSection.pool);
+    cubits.pane.update(
+      active: true,
+      height: screen.pane.midHeight,
+      max: screen.pane.midHeightPercent,
+      min: screen.pane.midHeightPercent,
+    );
+    await inactivateAllBut(cubits.pool.key);
+    cubits.pool.update(active: true, isSubmitting: false);
+    cubits.fade.update(fade: FadeEvent.fadeIn);
+    cubits.ignore.update(active: false);
+    await Future.delayed(slideDuration, () => cubits.app.animating = false);
+    locked = false;
+  }
+
   Future<void> activateSwapOnHolding() async {
     if (locked) {
       return;

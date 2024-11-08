@@ -1,7 +1,18 @@
 enum ConsentDocument {
-  user_agreement,
-  privacy_policy,
-  risk_disclosures,
+  userAgreement,
+  privacyPolicy,
+  riskDisclosures;
+
+  String get urlName {
+    switch (this) {
+      case ConsentDocument.userAgreement:
+        return 'user_agreement';
+      case ConsentDocument.privacyPolicy:
+        return 'privacy_policy';
+      case ConsentDocument.riskDisclosures:
+        return 'risk_disclosures';
+    }
+  }
 }
 
 class Consent {
@@ -26,15 +37,15 @@ String documentEndpoint(ConsentDocument consentDocument) =>
 //  final Consent consent = Consent();
 //  final bool userAgreement = await consent.haveIConsented(
 //    deviceId,
-//    ConsentDocument.user_agreement,
+//    ConsentDocument.userAgreement,
 //  );
 //  final bool privacyPolicy = await consent.haveIConsented(
 //    deviceId,
-//    ConsentDocument.privacy_policy,
+//    ConsentDocument.privacyPolicy,
 //  );
 //  final bool riskDisclosure = await consent.haveIConsented(
 //    deviceId,
-//    ConsentDocument.risk_disclosures,
+//    ConsentDocument.riskDisclosures,
 //  );
 //  return userAgreement && privacyPolicy && riskDisclosure;
 //}
@@ -44,15 +55,15 @@ String documentEndpoint(ConsentDocument consentDocument) =>
 //  final Consent consent = Consent();
 //  await consent.client.document.upload(
 //      'QmbjXoq2jj3ikqtJVUCAPhzmSdQY1QderYYNiDxABbMVoY',
-//      ConsentDocument.user_agreement.name,
+//      ConsentDocument.userAgreement.urlName,
 //      'June 17, 2022');
 //  await consent.client.document.upload(
 //      'QmfXjUQyEPxkn9ShSxtSQH8tNVhrzoLfSNtbTYm7PfKVsc',
-//      ConsentDocument.privacy_policy.name,
+//      ConsentDocument.privacyPolicy.urlName,
 //      'June 17, 2022');
 //  await consent.client.document.upload(
 //      'Qmb86hqUJNCUrpwukZtuWUqunL7GhrkwjZErmWNMbhf5HE',
-//      ConsentDocument.risk_disclosures.name,
+//      ConsentDocument.riskDisclosures.urlName,
 //      null);
 //}
 

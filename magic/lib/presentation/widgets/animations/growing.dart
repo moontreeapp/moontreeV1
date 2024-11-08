@@ -211,12 +211,12 @@ class TranslatePosition extends StatefulWidget {
   });
 
   @override
-  Translate_PositionState createState() => Translate_PositionState();
+  TranslatePositionState createState() => TranslatePositionState();
 
   static Duration get defaultDuraiton => slideDuration;
 }
 
-class Translate_PositionState extends State<TranslatePosition> {
+class TranslatePositionState extends State<TranslatePosition> {
   //bool isExpanded = false;
 
   @override

@@ -193,7 +193,7 @@ void printOutSecrets() {
           final maxId = cubits.keys.master.derivationWallets[i]
                   .maxIds[blockchain]?[exposure] ??
               0;
-          print(maxId);
+          see(maxId);
           for (final idx in range(maxId + 1)) {
             final xpub = cubits.keys.master.derivationWallets[i]
                 .rootsMap(blockchain)[exposure]!;

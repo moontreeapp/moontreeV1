@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:electrum_adapter/electrum_adapter.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
+import 'package:magic/utils/log.dart';
 
 /// client creation, logic, and settings.
 class EClientService {
@@ -44,7 +45,7 @@ class EClientService {
         connectionTimeout: connectionTimeout,
       );
     } on SocketException catch (_) {
-      print(_);
+      see(_);
     }
     return null;
   }

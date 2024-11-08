@@ -5,6 +5,7 @@ import 'package:magic/cubits/fade/cubit.dart';
 import 'package:magic/cubits/pane/cubit.dart';
 import 'package:magic/domain/concepts/side.dart';
 import 'package:magic/presentation/theme/colors.dart';
+import 'package:magic/presentation/ui/pane/pool/pool.dart';
 import 'package:magic/presentation/ui/pane/receive/receive.dart';
 import 'package:magic/presentation/ui/pane/send/send.dart';
 import 'package:magic/presentation/ui/pane/transaction/transaction.dart';
@@ -129,6 +130,7 @@ class DraggablePaneStack extends StatelessWidget {
         Transaction(),
         Send(),
         Receive(),
+        Pool(),
         EmptyFeed(),
         FadeLayer(),
       ]);

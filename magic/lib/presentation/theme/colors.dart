@@ -14,6 +14,7 @@ class AppColors {
   static const Color success = Color(0xFF34C759);
   static const Color success67 = Color(0xAB34C759);
   static const Color toast = Color(0xFF424242);
+
   //static const Color successDark =
   //    Color(0xFF34C759); //success.withOpacity(.67);
 
@@ -21,19 +22,19 @@ class AppColors {
   static const Color subtitle = Colors.white60;
 
   static ColorScheme colorScheme = const ColorScheme(
-      brightness: Brightness.light,
-      primary: primary,
-      onPrimary: Colors.white,
-      secondary: secondary,
-      onSecondary: Colors.transparent,
-      error: error,
-      onError: Colors.white,
-      background: background,
-      onBackground: Colors.transparent,
-      surface: Colors.white,
-      onSurface: Colors.transparent);
+    brightness: Brightness.light,
+    primary: primary,
+    onPrimary: Colors.white,
+    secondary: secondary,
+    onSecondary: Colors.transparent,
+    error: error,
+    onError: Colors.white,
+    surface: background,
+    onSurface: Colors.transparent,
+  );
 
   static const Color error = Color(0xFFEF5350);
+
   //static const Color success = Color(0xFF66BB6A);
   //static const Color success = Color(0xFF8BC34A);
   static const Color successDark = Color(0xFF7AAB41);

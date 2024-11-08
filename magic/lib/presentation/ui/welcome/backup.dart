@@ -6,6 +6,7 @@ import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/ui/welcome/privacy.dart';
 import 'package:magic/presentation/utils/animation.dart';
+import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 
 enum BackupLifeCycle {
@@ -166,52 +167,28 @@ class BackupPageState extends State<BackupPage> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Expanded(
-                                child: SizedBox(
+                                child: AppButton(
+                                  onPressed: () =>
+                                      toStage(BackupLifeCycle.exiting),
+                                  label: 'NO',
+                                  buttonColor: AppColors.foreground,
+                                  textColor: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                   height: 56,
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        toStage(BackupLifeCycle.exiting),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.foreground,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(28 * 100),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'NO',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
                                 ),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
-                                child: SizedBox(
+                                child: AppButton(
+                                  onPressed: () =>
+                                      toStage(BackupLifeCycle.shown),
+                                  label: 'YES',
+                                  buttonColor: AppColors.button,
+                                  textColor: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
                                   height: 56,
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        toStage(BackupLifeCycle.shown),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.button,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(28 * 100),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'YES',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
                                 ),
                               ),
                             ],

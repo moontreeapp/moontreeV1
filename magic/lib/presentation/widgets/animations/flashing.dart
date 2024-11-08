@@ -10,14 +10,14 @@ class FadeHighlight extends StatefulWidget {
   final Duration? delay;
   final Duration? duration;
   const FadeHighlight({
-    Key? key,
+    super.key,
     required this.child,
     this.onEnd,
     this.color,
     this.background,
     this.delay,
     this.duration,
-  }) : super(key: key);
+  });
 
   @override
   FadeHighlightState createState() => FadeHighlightState();

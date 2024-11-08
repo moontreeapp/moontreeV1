@@ -16,8 +16,8 @@ class PanelPage extends StatelessWidget {
         if (state.child != null) {
           final DraggableScrollableController draggableScrollController =
               DraggableScrollableController();
-          final double minExtent = 0.61;
-          final double maxExtent = 1.0;
+          const double minExtent = 0.61;
+          const double maxExtent = 1.0;
           // not sure this must be tracked in our system
           //components.cubits.bottomModalSheet
           //        .setHeight(minExtent * screen.app.height);

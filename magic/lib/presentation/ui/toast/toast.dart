@@ -5,8 +5,6 @@ import 'package:magic/presentation/theme/text.dart';
 //import 'package:magic/presentation/widgets/assets/shadows.dart';
 import 'package:magic/services/services.dart' show screen;
 import 'package:magic/presentation/theme/colors.dart';
-import 'package:magic/presentation/theme/extensions.dart';
-import 'package:magic/presentation/theme/fonts.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/animations/fading.dart';
 

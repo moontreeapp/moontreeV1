@@ -22,9 +22,7 @@ class PausableSnapScrollController extends ScrollController {
 class SensitiveScrollPhysics extends ScrollPhysics {
   final double sensitivityFactor;
 
-  SensitiveScrollPhysics(
-      {required this.sensitivityFactor, ScrollPhysics? parent})
-      : super(parent: parent);
+  const SensitiveScrollPhysics({required this.sensitivityFactor, super.parent});
 
   @override
   SensitiveScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -41,7 +39,7 @@ class SensitiveScrollPhysics extends ScrollPhysics {
 }
 
 ///Anchor location for selected item in the list
-enum SelectedItemAnchor { START, MIDDLE, END }
+enum SelectedItemAnchor { start, middle, end }
 
 ///A ListView widget that able to "snap" or focus to an item whenever user scrolls.
 ///
@@ -244,7 +242,7 @@ class ScrollSnapList extends StatefulWidget {
     this.dynamicItemSize = false,
     this.dynamicSizeEquation,
     this.dynamicItemOpacity,
-    this.selectedItemAnchor = SelectedItemAnchor.MIDDLE,
+    this.selectedItemAnchor = SelectedItemAnchor.middle,
     this.shrinkWrap = false,
     this.scrollPhysics,
     this.clipBehavior = Clip.hardEdge,
@@ -272,6 +270,7 @@ class ScrollSnapListState extends State<ScrollSnapList> {
   //Current scroll-position in pixel
   double currentPixel = 0;
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -284,8 +283,8 @@ class ScrollSnapListState extends State<ScrollSnapList> {
     });
 
     ///After initial jump, set isInit to false
-    Future.delayed(Duration(milliseconds: 10), () {
-      if (this.mounted) {
+    Future.delayed(const Duration(milliseconds: 10), () {
+      if (mounted) {
         setState(() {
           isInit = false;
         });
@@ -300,7 +299,7 @@ class ScrollSnapListState extends State<ScrollSnapList> {
   ///Scroll list to an offset
   void _animateScroll(double location) {
     Future.delayed(Duration.zero, () {
-      if (this.mounted) {
+      if (mounted) {
         widget.listController
             .animateTo(
           location,
@@ -346,16 +345,16 @@ class ScrollSnapListState extends State<ScrollSnapList> {
     if (widget.dynamicItemSize) {
       child = Transform.scale(
         scale: calculateScale(index),
-        child: widget.itemBuilder(context, index),
         alignment: widget.alignment,
+        child: widget.itemBuilder(context, index),
       );
     } else {
       child = widget.itemBuilder(context, index);
     }
     if (widget.dynamicItemOpacity != null) {
-      child = Opacity(child: child, opacity: calculateOpacity(index));
+      child = Opacity(opacity: calculateOpacity(index), child: child);
     }
-    if (widget.focusOnItemTap)
+    if (widget.focusOnItemTap) {
       return GestureDetector(
         onVerticalDragEnd: (details) {
           if (widget.onFlick != null) {
@@ -382,6 +381,7 @@ class ScrollSnapListState extends State<ScrollSnapList> {
         },
         child: child,
       );
+    }
 
     return child;
   }
@@ -398,8 +398,7 @@ class ScrollSnapListState extends State<ScrollSnapList> {
     //listPadding is not considered as moving pixel by scroll (0.0 is after padding)
     //substracted by itemSize/2 (to center the item)
     //divided by pixels taken by each item
-    int cardIndex =
-        index != null ? index : ((pixel! - itemSize / 2) / itemSize).ceil();
+    int cardIndex = index ?? ((pixel! - itemSize / 2) / itemSize).ceil();
     //Avoid index getting out of bounds
     if (cardIndex < 0) {
       cardIndex = 0;
@@ -464,18 +463,18 @@ class ScrollSnapListState extends State<ScrollSnapList> {
   /// fyi I don't think this has any effect.
   double calculateListPadding(BoxConstraints constraint) {
     switch (widget.selectedItemAnchor) {
-      case SelectedItemAnchor.MIDDLE:
+      case SelectedItemAnchor.middle:
         return (widget.scrollDirection == Axis.horizontal
                     ? constraint.maxWidth
                     : constraint.maxHeight) /
                 2 -
             widget.itemSize / 2;
-      case SelectedItemAnchor.END:
+      case SelectedItemAnchor.end:
         return (widget.scrollDirection == Axis.horizontal
                 ? constraint.maxWidth
                 : constraint.maxHeight) -
             widget.itemSize;
-      case SelectedItemAnchor.START:
+      case SelectedItemAnchor.start:
       default:
         return 0;
     }
@@ -496,7 +495,7 @@ class ScrollSnapListState extends State<ScrollSnapList> {
         //),
         child: LayoutBuilder(
           builder: (BuildContext ctx, BoxConstraints constraint) {
-            double _listPadding = calculateListPadding(constraint);
+            double listPadding = calculateListPadding(constraint);
             return GestureDetector(
               //by catching onTapDown gesture, it's possible to keep animateTo from removing user's scroll listener
               behavior: HitTestBehavior.translucent,
@@ -650,12 +649,12 @@ class ScrollSnapListState extends State<ScrollSnapList> {
                           ? EdgeInsets.symmetric(
                               horizontal: max(
                               0,
-                              _listPadding,
+                              listPadding,
                             ))
                           : EdgeInsets.symmetric(
                               vertical: max(
                                 0,
-                                _listPadding,
+                                listPadding,
                               ),
                             )),
                   reverse: widget.reverse,

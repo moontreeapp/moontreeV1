@@ -2,6 +2,7 @@
 /// the app open and active or not - on change it should notify a stream below
 /// in the raven lib so that certain logic can be executed given each case.
 /// as such, I think this component need to be attached to each page.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:magic/cubits/cubit.dart';

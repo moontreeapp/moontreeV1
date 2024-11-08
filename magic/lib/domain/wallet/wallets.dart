@@ -16,7 +16,6 @@ import 'package:bip32/bip32.dart' as bip32;
 import 'package:convert/convert.dart';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:magic/cubits/cubit.dart';
-import 'package:magic/cubits/pane/send/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/blockchain/derivation.dart';
 import 'package:magic/domain/blockchain/exposure.dart';

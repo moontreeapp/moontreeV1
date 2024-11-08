@@ -13,6 +13,7 @@ class LoginNative extends StatefulWidget {
   final Widget child;
   final Function? onFailure;
   final Function? onThen;
+
   const LoginNative({
     super.key,
     this.child = const SizedBox.shrink(),

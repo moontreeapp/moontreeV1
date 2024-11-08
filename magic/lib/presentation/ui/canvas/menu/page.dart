@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -348,7 +347,7 @@ class LegalLinks extends StatelessWidget {
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse(
-                          documentEndpoint(ConsentDocument.user_agreement)));
+                          documentEndpoint(ConsentDocument.userAgreement)));
                     }),
               const TextSpan(text: '   '),
               TextSpan(
@@ -357,7 +356,7 @@ class LegalLinks extends StatelessWidget {
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse(
-                          documentEndpoint(ConsentDocument.privacy_policy)));
+                          documentEndpoint(ConsentDocument.privacyPolicy)));
                     }),
               const TextSpan(text: '   '),
               TextSpan(
@@ -366,7 +365,7 @@ class LegalLinks extends StatelessWidget {
                   recognizer: TapGestureRecognizer()
                     ..onTap = () {
                       launchUrl(Uri.parse(
-                          documentEndpoint(ConsentDocument.risk_disclosures)));
+                          documentEndpoint(ConsentDocument.riskDisclosures)));
                     }),
             ],
           ),

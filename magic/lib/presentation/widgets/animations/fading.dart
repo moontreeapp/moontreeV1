@@ -104,20 +104,20 @@ class FadeIn0 extends StatefulWidget {
   final Duration delay;
 
   const FadeIn0({
-    Key? key,
+    super.key,
     required this.child,
     this.enter = true,
     this.duration = animation.fadeDuration,
     this.refade = false,
     this.delay = Duration.zero,
-  }) : super(key: key);
+  });
 
   @override
-  _FadeIn0State createState() => _FadeIn0State();
+  FadeIn0State createState() => FadeIn0State();
 }
 
-class _FadeIn0State extends State<FadeIn0> {
-  ValueNotifier<double> _opacityNotifier = ValueNotifier(0.0);
+class FadeIn0State extends State<FadeIn0> {
+  final ValueNotifier<double> _opacityNotifier = ValueNotifier(0.0);
 
   @override
   void initState() {
@@ -166,19 +166,19 @@ class FadeIn2 extends StatefulWidget {
   final Duration delay;
 
   const FadeIn2({
-    Key? key,
+    super.key,
     required this.child,
     this.enter = true,
     this.duration = animation.fadeDuration,
     this.refade = false,
     this.delay = Duration.zero,
-  }) : super(key: key);
+  });
 
   @override
-  _FadeIn2State createState() => _FadeIn2State();
+  FadeIn2State createState() => FadeIn2State();
 }
 
-class _FadeIn2State extends State<FadeIn2> with SingleTickerProviderStateMixin {
+class FadeIn2State extends State<FadeIn2> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
   bool built = false;
@@ -284,25 +284,25 @@ class FadeOut extends StatefulWidget {
   });
 
   @override
-  _FadeOutState createState() => _FadeOutState();
+  FadeOutState createState() => FadeOutState();
 }
 
-class _FadeOutState extends State<FadeOut> with SingleTickerProviderStateMixin {
+class FadeOutState extends State<FadeOut> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-      _controller = AnimationController(
-        vsync: this,
-        duration: widget.duration,
-      );
-      _animation = Tween<double>(begin: 1, end: 0)
-          .animate(CurvedAnimation(parent: _controller, curve: widget.curve))
-        ..addListener(() {
-          setState(() {});
-        });
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.duration,
+    );
+    _animation = Tween<double>(begin: 1, end: 0)
+        .animate(CurvedAnimation(parent: _controller, curve: widget.curve))
+      ..addListener(() {
+        setState(() {});
+      });
 
     if (widget.enabled) {
       Future.delayed(widget.delay, () {
@@ -358,16 +358,16 @@ class FadeOutInBroken extends StatefulWidget {
   final Widget child;
 
   const FadeOutInBroken({
-    Key? key,
+    super.key,
     required this.out,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
-  _FadeOutInBrokenState createState() => _FadeOutInBrokenState();
+  FadeOutInBrokenState createState() => FadeOutInBrokenState();
 }
 
-class _FadeOutInBrokenState extends State<FadeOutInBroken>
+class FadeOutInBrokenState extends State<FadeOutInBroken>
     with TickerProviderStateMixin {
   late AnimationController _fadeOutController;
   late AnimationController _fadeInController;
@@ -426,18 +426,18 @@ class FadeOutIn extends StatefulWidget {
   final Duration inDuration;
 
   const FadeOutIn({
-    Key? key,
+    super.key,
     required this.out,
     required this.child,
     this.outDuration = animation.fadeDuration,
     this.inDuration = animation.fadeDuration,
-  }) : super(key: key);
+  });
 
   @override
-  _FadeOutInState createState() => _FadeOutInState();
+  FadeOutInState createState() => FadeOutInState();
 }
 
-class _FadeOutInState extends State<FadeOutIn> {
+class FadeOutInState extends State<FadeOutIn> {
   bool _out = true;
 
   @override
@@ -457,6 +457,6 @@ class _FadeOutInState extends State<FadeOutIn> {
       return FadeOut(duration: widget.outDuration, child: widget.out);
     }
     return FadeIn(
-        duration: widget.inDuration, child: widget.child, refade: true);
+        duration: widget.inDuration, refade: true, child: widget.child);
   }
 }

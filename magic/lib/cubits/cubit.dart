@@ -18,6 +18,7 @@ class GlobalCubits {
   final send = SendCubit();
   final receive = ReceiveCubit();
   final swap = SwapCubit();
+  final pool = PoolCubit();
   final manage = ManageCubit();
   final fade = FadeCubit();
 
@@ -55,7 +56,7 @@ class GlobalCubits {
         welcome,
       ];
   List<UpdatableCubit> get paneCubits =>
-      [wallet, transactions, transaction, send, receive, swap, manage];
+      [wallet, transactions, transaction, send, receive, pool, swap, manage];
 
   List<SingleChildWidget> get providers => [
         BlocProvider<CanvasCubit>(create: (context) => canvas),
@@ -69,6 +70,7 @@ class GlobalCubits {
         BlocProvider<TransactionsCubit>(create: (context) => transactions),
         BlocProvider<ReceiveCubit>(create: (context) => receive),
         BlocProvider<SendCubit>(create: (context) => send),
+        BlocProvider<PoolCubit>(create: (context) => pool),
         BlocProvider<ManageCubit>(create: (context) => manage),
         BlocProvider<FadeCubit>(create: (context) => fade),
         BlocProvider<AppbarCubit>(create: (context) => appbar),

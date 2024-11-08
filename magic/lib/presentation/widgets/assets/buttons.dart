@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/services/services.dart' as uiservices;
 
-final _borderMaterialShape =
-    MaterialStateProperty.all(BorderSide(color: AppColors.primary, width: 2.0));
-final _disabledBorderMaterialShape = MaterialStateProperty.all(
-    BorderSide(color: AppColors.disabled, width: 2.0));
-final _buttonMaterialShape = MaterialStateProperty.all(RoundedRectangleBorder(
+final _borderMaterialShape = WidgetStateProperty.all(
+    const BorderSide(color: AppColors.primary, width: 2.0));
+final _disabledBorderMaterialShape = WidgetStateProperty.all(
+    const BorderSide(color: AppColors.disabled, width: 2.0));
+final _buttonMaterialShape = WidgetStateProperty.all(RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(uiservices.screen.buttonBorderRadius)));
-final _disabledMaterial = MaterialStateProperty.all(AppColors.primary38);
-final _enabledMaterial = MaterialStateProperty.all(AppColors.primary);
-final _unfilledMaterial = MaterialStateProperty.all(AppColors.background);
+final _disabledMaterial = WidgetStateProperty.all(AppColors.primary38);
+final _enabledMaterial = WidgetStateProperty.all(AppColors.primary);
+final _unfilledMaterial = WidgetStateProperty.all(AppColors.background);
 
 final _enabledFilledButtonStyle = ButtonStyle(
   backgroundColor: _enabledMaterial,
@@ -162,11 +162,11 @@ class BigButton extends StatelessWidget {
             ),
             outlinedButtonTheme: OutlinedButtonThemeData(
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                overlayColor: MaterialStateProperty.resolveWith(
+                backgroundColor: WidgetStateProperty.all(Colors.white),
+                overlayColor: WidgetStateProperty.resolveWith(
                     (states) => Colors.transparent),
-                elevation: MaterialStateProperty.all(0),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                elevation: WidgetStateProperty.all(0),
+                shape: WidgetStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(250))),
               ),
             ),
@@ -174,13 +174,13 @@ class BigButton extends StatelessWidget {
           child: OutlinedButton(
             focusNode: focusNode,
             style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                foregroundColor: MaterialStateProperty.all(Colors.white),
-                overlayColor: MaterialStateProperty.all(
+                backgroundColor: WidgetStateProperty.all(Colors.white),
+                foregroundColor: WidgetStateProperty.all(Colors.white),
+                overlayColor: WidgetStateProperty.all(
                     Colors.transparent), // Prevent overlay color
                 elevation:
-                    MaterialStateProperty.all(0), // Remove elevation shadow
-                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    WidgetStateProperty.all(0), // Remove elevation shadow
+                shape: WidgetStateProperty.all(RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(250)))),
             onPressed: enabled
                 ? (link != null
@@ -225,7 +225,7 @@ class GradientButtonFormatted extends StatelessWidget {
         child: Opacity(
           opacity: .87,
           child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(25.0),

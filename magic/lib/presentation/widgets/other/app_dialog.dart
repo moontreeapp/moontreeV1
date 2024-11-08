@@ -117,3 +117,78 @@ void showUSBDebuggingWarningDialog(BuildContext context) {
     },
   );
 }
+
+void showAppDialog({
+  required BuildContext context,
+  required String title,
+  required String content,
+  required VoidCallback onYes,
+}) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppColors.backhalf,
+        title: Text(title),
+        content: Text(
+          content,
+          style: const TextStyle(
+            fontSize: 13,
+            color: Colors.white,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        actions: <Widget>[
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.backhalf,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(200),
+                      side: const BorderSide(color: AppColors.button, width: 1),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'No',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.button,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(200),
+                    ),
+                  ),
+                  onPressed: onYes,
+                  child: const Text(
+                    'Yes',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    },
+  );
+}

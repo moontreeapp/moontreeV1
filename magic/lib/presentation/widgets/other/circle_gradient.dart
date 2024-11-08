@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 class ColorPair {
   const ColorPair(this.colorInt1, this.colorInt2);
+
   final int colorInt1, colorInt2;
+
   Color get color1 => Color(colorInt1);
+
   Color get color2 => Color(colorInt2);
 }
 
@@ -25,6 +28,7 @@ const List<ColorPair> gradients = <ColorPair>[
 
 class CircleGradient extends CustomPainter {
   CircleGradient(this.colors);
+
   final ColorPair colors;
 
   @override
@@ -61,9 +65,11 @@ class CircleGradient extends CustomPainter {
 
 class PopCircle extends StatelessWidget {
   const PopCircle({
+    super.key,
     this.colorPair = PopCircle.defaultColorPair,
     this.padding = EdgeInsets.zero,
   });
+
   static const ColorPair defaultColorPair = ColorPair(0xFFC93538, 0xFF993436);
 
   final ColorPair colorPair;
