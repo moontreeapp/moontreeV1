@@ -31,10 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.1
-  flutter_svg: ^2.0.9
+  flutter_svg: ^2.0.14
   flutter_hicons: ^0.1.0
   flutter_secure_storage: ^9.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.1
   equatable: ^2.0.5
   intl: ^0.19.0 # for formatting numbers into comma separated Strings
   lit_relative_date_time: ^1.2.0
@@ -48,12 +48,12 @@ dependencies:
   moontree_utils: ^1.1.7
 
   # 3rd party packages
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
   provider: ^6.1.2
-  url_launcher: ^6.2.5
+  url_launcher: ^6.3.1
   bip39: ^1.0.6
   qr_flutter: ^4.1.0
-  convert: ^3.1.1
+  convert: ^3.1.2
   bs58: ^1.0.2
   pointycastle: ^3.6.2
   serverpod_client: ^1.1.0
@@ -62,27 +62,31 @@ dependencies:
   http: ^1.2.1
   tuple: ^2.0.2
   local_auth: ^2.2.0
-  crypto: ^3.0.3
+  crypto: ^3.0.6
   mobile_scanner: ^6.0.0
 
   electrum_adapter: ^2.0.4
   bip32: ^2.0.0
   shared_preferences: ^2.3.2
   hex: ^0.2.0
-  build_runner: ^2.4.0
+  build_runner: ^2.4.13
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^5.0.0
   ansi_logger: ^2.0.11
-  web_socket_client: ^0.1.0
+  web_socket_client: ^0.1.5
   no_screenshot: ^0.3.1
   screenshot: ^3.0.0
-  share_plus: ^10.1.1
-  path_provider: ^2.1.4
+  share_plus: ^10.1.2
+  path_provider: ^2.1.5
   app_links: ^6.3.2
+
+dependency_overrides:
+  collection: ^1.19.1
+  web: ^1.0.0
 
 dev_dependencies:
  flutter_test:

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:magic/cubits/canvas/menu/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/cubits/pane/wallet/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/asset_icons.dart';
@@ -269,7 +270,8 @@ class SimpleIdenticon extends StatelessWidget {
   final double? width;
   final TextStyle? style;
   final bool showAppIcon;
-  final bool showBlockchainIcon;
+  //final bool showBlockchainIcon;
+  final bool showPoolIndicatorIcon;
   final bool? admin;
   final Blockchain? blockchain;
 
@@ -282,7 +284,8 @@ class SimpleIdenticon extends StatelessWidget {
     this.width,
     this.height,
     this.showAppIcon = false,
-    this.showBlockchainIcon = false,
+    //this.showBlockchainIcon = false,
+    this.showPoolIndicatorIcon = false,
     this.style,
     this.admin,
     this.blockchain,
@@ -329,10 +332,14 @@ class SimpleIdenticon extends StatelessWidget {
         //  width: 2.0,
         //),
       ),
-      child: showBlockchainIcon
+      child: showPoolIndicatorIcon
           ? Image.asset(
               iconPath ?? blockchain!.logo,
             )
+          //: showBlockchainIcon
+          //    ? Image.asset(
+          //        iconPath ?? blockchain!.logo,
+          //      )
           : showAppIcon
               ? SvgPicture.asset(
                   LogoIcons.appLogo,
@@ -361,13 +368,20 @@ class SimpleIdenticon extends StatelessWidget {
                 ),
               ),
             ),
-          if (blockchain != null)
+          if (blockchain != null &&
+              (showPoolIndicatorIcon &&
+                      cubits.pool.state.poolStatus == PoolStatus.joined ||
+                  !showPoolIndicatorIcon))
             Positioned(
               left: 0,
               bottom: 0,
               child: Container(
-                width: screen.iconSmall,
-                height: screen.iconSmall,
+                width: showPoolIndicatorIcon
+                    ? screen.iconMedium
+                    : screen.iconSmall,
+                height: showPoolIndicatorIcon
+                    ? screen.iconMedium
+                    : screen.iconSmall,
                 // TODO: implement chain icons for assets with the same name on different chains
                 // TODO: This code works but it get's applied to all assets currently.
                 // width: blockchainIconSizeValue,
@@ -375,15 +389,15 @@ class SimpleIdenticon extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: showBlockchainIcon
+                  color: showPoolIndicatorIcon //||showBlockchainIcon
                       ? AppColors.buttonLight
                       : AppColors.background,
                 ),
-                child: showBlockchainIcon
+                child: showPoolIndicatorIcon
                     ? SvgPicture.asset(
                         '${TransactionIcons.base}/pool.${TransactionIcons.ext}',
-                        height: screen.iconSmall - 5,
-                        width: screen.iconSmall - 5,
+                        height: screen.iconMedium - 10,
+                        width: screen.iconMedium - 10,
                       )
                     : Image.asset(
                         showAppIcon
@@ -432,6 +446,7 @@ class AssetIdenticon extends StatelessWidget {
         // blockchainIconSize: BlockchainIconSize.extraSmall,
       );
     }
+    final showPoolIndicatorIcon = holding.asset.name.toLowerCase() == 'satori';
     return Stack(
       children: [
         Container(
@@ -448,7 +463,10 @@ class AssetIdenticon extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ),
-        if (blockchain != null)
+        if (blockchain != null ||
+            (showPoolIndicatorIcon &&
+                    cubits.pool.state.poolStatus == PoolStatus.joined ||
+                !showPoolIndicatorIcon))
           Positioned(
             left: 0,
             bottom: 0,
@@ -456,15 +474,23 @@ class AssetIdenticon extends StatelessWidget {
               width: screen.iconSmall,
               height: screen.iconSmall,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.background,
+                color: showPoolIndicatorIcon
+                    ? AppColors.button
+                    : AppColors.background,
               ),
-              child: Image.asset(
-                blockchain!.logo,
-                width: screen.iconSmall,
-                height: screen.iconSmall,
-              ),
+              child: showPoolIndicatorIcon
+                  ? SvgPicture.asset(
+                      '${TransactionIcons.base}/pool.${TransactionIcons.ext}',
+                      height: screen.iconSmall - 5,
+                      width: screen.iconSmall - 5,
+                    )
+                  : Image.asset(
+                      blockchain?.logo ?? '',
+                      width: screen.iconSmall,
+                      height: screen.iconSmall,
+                    ),
             ),
           ),
       ],

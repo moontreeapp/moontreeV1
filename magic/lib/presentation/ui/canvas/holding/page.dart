@@ -66,7 +66,8 @@ class AnimatedCoinSpec extends StatelessWidget {
                   style: AppText.identiconHuge,
                   admin: holding.isAdmin,
                   blockchain: blockchain,
-                  showBlockchainIcon: true,
+                  //showBlockchainIcon: true,
+                  showPoolIndicatorIcon: true,
                 )
               : holding.isCurrency
                   ? CurrencyIdenticon(
