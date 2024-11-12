@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:magic/services/services.dart' as services;
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 //import 'package:magic/presentation/services/services.dart' show sail;
 
 class SystemBackButton {
@@ -28,7 +28,7 @@ class SystemBackButton {
         // if custom bottom modalsheet always in front is up navigator pop
         // instead of pop we should do nothing. the context isn't available and
         // some of these we want to do nothing anyway.
-        see('back button disabled in this case');
+        logD('back button disabled in this case');
       } else {
         //await services.sail.back();
         sendToBackChannel.invokeMethod('sendToBackground');
@@ -55,7 +55,6 @@ class SystemBackButton {
   void push(Function fn) => setNextFunction(fn);
   void pop() => useNextFunction();
 }
-
 
 // if you use a global key on a widget that has a controller:
 // globalKey.currentState._controller.forward();

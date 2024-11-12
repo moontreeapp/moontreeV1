@@ -7,7 +7,7 @@ import 'package:magic/domain/concepts/money/security.dart';
 import 'package:magic/services/rate.dart';
 import 'package:magic/domain/concepts/money/rate.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/moontree_utils.dart' show Trigger;
 
 class RateWaiter extends Trigger {
@@ -58,7 +58,7 @@ class RateWaiter extends Trigger {
           await _getExistingRate(rateGrabber) ??
           0;
     } catch (e) {
-      see('unable to grab rates', '', AnsiColors.red);
+      logE('unable to grab rates');
       return 0;
     }
   }
@@ -99,7 +99,7 @@ class RateWaiter extends Trigger {
   }
 
   void _save({required RateGrabber rateGrabber, required double rate}) {
-    see('saving ${rateGrabber.symbol}, rate: $rate');
+    logD('saving ${rateGrabber.symbol}, rate: $rate');
     switch (rateGrabber.symbol) {
       case 'EVR':
         evrUsdRate = _toRate(rateGrabber: rateGrabber, rate: rate);

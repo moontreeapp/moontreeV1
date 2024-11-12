@@ -3,7 +3,7 @@ import 'package:magic/services/services.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class Privacy extends StatefulWidget {
   final Widget child;
@@ -28,7 +28,7 @@ class _PrivacyState extends State<Privacy> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    see('is in background: $_isInBackground');
+    logD('is in background: $_isInBackground');
     switch (state) {
       case AppLifecycleState.resumed:
         if (_isInBackground) {

@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 enum AuthenticationResult {
   skipped,
@@ -20,7 +20,7 @@ class LocalAuthApi {
     try {
       return await _auth.canCheckBiometrics;
     } on PlatformException catch (e) {
-      see(e);
+      logD(e);
       return false;
     }
   }
@@ -125,7 +125,7 @@ class LocalAuthApi {
       [PlatformException].
       (Therefore we should fall back on the password posibility.)
       */
-      see(e);
+      logD(e);
       reason = AuthenticationResult.error;
     }
     return false;

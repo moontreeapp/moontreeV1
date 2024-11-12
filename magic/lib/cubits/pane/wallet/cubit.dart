@@ -16,7 +16,7 @@ import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/utils/range.dart';
 import 'package:magic/services/calls/holdings.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 part 'state.dart';
 
@@ -111,7 +111,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
     populatedAt = DateTime.now();
     // remember to order by currency first, amount second, alphabetical third
     update(isSubmitting: true);
-    see('populateAssets');
+    logD('populateAssets');
     final holdings = setCorrespondingFlag(_sort(_newRateThese(
             symbol: 'EVR',
             rate: await rates.getRateOf('EVR'),
@@ -128,7 +128,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
               derivationWallets: cubits.keys.master.derivationWallets,
               keypairWallets: cubits.keys.master.keypairWallets,
             ).call())));
-    see('holdings:', holdings, AnsiColors.imperialPurple);
+    logWTF('holdings: $holdings');
     if (holdings.isNotEmpty) {
       update(holdings: [], isSubmitting: false);
       update(holdings: holdings, isSubmitting: false);
@@ -164,7 +164,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
   List<Holding> setCorrespondingFlag(List<Holding> holdings) {
     final ret = <Holding>[];
     for (final holding in holdings) {
-      see(holding.symbol);
+      logD(holding.symbol);
       if (holding.isCurrency) {
         ret.add(holding);
       } else if (holding.isAdmin && mainOf(holding, holdings) != null) {

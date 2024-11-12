@@ -11,7 +11,7 @@ import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/utils/range.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 enum AddressesLifeCycle {
   entering,
@@ -141,15 +141,16 @@ String exposureLabel(Exposure exposure) {
 
 void printOutSecrets() {
   for (int i = 0; i < cubits.keys.master.derivationWallets.length; i++) {
-    see('Wallet Index: $i');
+    logD('Wallet Index: $i');
     for (final blockchain in Blockchain.mainnets) {
       for (final exposure in Exposure.values) {
-        see('Exposure: ${exposureLabel(exposure)}');
+        logD('Exposure: ${exposureLabel(exposure)}');
         if (cubits.keys.master.derivationWallets[i].hot) {
           for (final subwallet in cubits.keys.master.derivationWallets[i]
               .seedWallet(blockchain)
               .subwallets[exposure]!) {
-            see('Wallet: $i (${exposureLabel(exposure)}: ${(subwallet is HDWalletIndexed) ? subwallet.hdIndex : -1})\n${subwallet.address ?? 'unknown'}');
+            logD(
+                'Wallet: $i (${exposureLabel(exposure)}: ${(subwallet is HDWalletIndexed) ? subwallet.hdIndex : -1})\n${subwallet.address ?? 'unknown'}');
             Container(
                 padding:
                     const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
@@ -193,11 +194,12 @@ void printOutSecrets() {
           final maxId = cubits.keys.master.derivationWallets[i]
                   .maxIds[blockchain]?[exposure] ??
               0;
-          see(maxId);
+          logD(maxId);
           for (final idx in range(maxId + 1)) {
             final xpub = cubits.keys.master.derivationWallets[i]
                 .rootsMap(blockchain)[exposure]!;
-            see('Wallet: $i (${exposureLabel(exposure)}: $idx)\n${blockchain.addressFromXPub(xpub, idx)}');
+            logD(
+                'Wallet: $i (${exposureLabel(exposure)}: $idx)\n${blockchain.addressFromXPub(xpub, idx)}');
             Container(
                 padding:
                     const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),

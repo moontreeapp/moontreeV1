@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:magic/cubits/app/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/presentation/ui/welcome/welcome.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class LockLayer extends StatelessWidget {
   const LockLayer({super.key});
@@ -14,7 +14,7 @@ class LockLayer extends StatelessWidget {
       buildWhen: (AppState previous, AppState current) =>
           previous.status != current.status,
       builder: (BuildContext context, AppState state) {
-        see(state.wasPaused, state.status, AnsiColors.imperialPurple);
+        logWTF('${state.wasPaused} ${state.status}');
         if (state.wasPaused &&
             state.status == AppLifecycleState.resumed &&
             !cubits.app.isAuthenticated) {
@@ -22,7 +22,7 @@ class LockLayer extends StatelessWidget {
           /// if fails or they cancel, it still lets them in.
           //import 'package:magic/presentation/ui/login/native.dart';
           //import 'package:moontree_utils/moontree_utils.dart';
-          //see('authenticating');
+          //logD('authenticating');
           //cubits.app.update(wasPaused: false);
           //cubits.welcome.update(
           //    active: true,

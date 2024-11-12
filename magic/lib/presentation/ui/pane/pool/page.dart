@@ -9,7 +9,11 @@ import 'package:magic/cubits/cubits.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
+
+// hdwallet = cubits.keys.master.derivationWallets.last.seedWallet(Blockchain.evrmore).externals.last;
+// save to secure storage with key satoriMagicPool and value hdwallet.privkey
+//SatoriServerClient().registerWallet(hdWallet: )
 
 class PoolPage extends StatelessWidget {
   const PoolPage({super.key});
@@ -136,7 +140,7 @@ class PoolContentState extends State<PoolContent> {
               amountText.text = fiatAmount.toString();
             });
           } catch (e) {
-            see(e);
+            logD(e);
           }
         } else {
           amountText.text = cubits.holding.state.holding.coin.entire();
@@ -170,7 +174,7 @@ class PoolContentState extends State<PoolContent> {
                 ? null
                 : cubits.send.invalidAmountMessages(amountText.text).first,
         onChanged: (value) {
-          see(value);
+          logD(value);
           if (automaticConversion) {
             return;
           }

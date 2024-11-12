@@ -21,7 +21,7 @@ import 'package:magic/domain/blockchain/derivation.dart';
 import 'package:magic/domain/blockchain/exposure.dart';
 import 'package:magic/domain/concepts/address.dart';
 import 'package:magic/domain/wallet/kpwallet.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/moontree_utils.dart' show decode;
 import 'package:wallet_utils/wallet_utils.dart'
     show ECPair, HDWallet, KPWallet, NetworkType, P2PKH, WalletBase;
@@ -313,11 +313,11 @@ class DerivationWallet extends Jsonable {
   //
   // /// this is the compressed version of the xpub. not very useful in HD context.
   // String? pubkey(Blockchain blockchain) {
-  //   //see('${blockchain.name} - ${seedWallet(blockchain).xpub}');
-  //   //see('${blockchain.name} - ${seedWallet(blockchain).hdWallet.pubKey}');
-  //   //see(
+  //   //logD('${blockchain.name} - ${seedWallet(blockchain).xpub}');
+  //   //logD('${blockchain.name} - ${seedWallet(blockchain).hdWallet.pubKey}');
+  //   //logD(
   //   //    '${blockchain.name} - ${seedWallet(blockchain).root(Exposure.external)} - external');
-  //   //see(
+  //   //logD(
   //   //    '${blockchain.name} - ${seedWallet(blockchain).root(Exposure.internal)} - internal');
   //   //Ravencoin - xpub661My...
   //   //Ravencoin - 0379c9413...
@@ -431,7 +431,7 @@ class SeedWallet {
       blockchain: blockchain,
       hardened: hdWallet.seed != null ? "'" : '',
     );
-    see('p: $path');
+    logD('p: $path');
     final sub = hdWallet.derivePath(path);
     final indexedSub = HDWalletIndexed(
         hdWallet: sub,
@@ -454,7 +454,7 @@ class SeedWallet {
         while (cubits.app.animating) {
           await Future.delayed(const Duration(milliseconds: 1000));
         }
-        see('subwalleting');
+        logD('subwalleting');
         subwallet(hdIndex: highestIndex[exposure]! + 1, exposure: exposure);
         highestIndex[exposure] = highestIndex[exposure]! + 1;
         // Yield control back to the UI thread

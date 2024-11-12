@@ -6,7 +6,7 @@ import 'package:local_auth/local_auth.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/services/security.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class LoginNative extends StatefulWidget {
@@ -88,13 +88,13 @@ class LoginNativeState extends State<LoginNative> {
       try {
         await platform.invokeMethod('openSecuritySettings');
       } on PlatformException catch (e) {
-        see("Failed to open security settings: '${e.message}'.");
+        logD("Failed to open security settings: '${e.message}'.");
       }
     } else if (Platform.isIOS) {
       if (await canLaunchUrlString('App-Prefs:root=TOUCHID_PASSCODE')) {
         await launchUrlString('App-Prefs:root=TOUCHID_PASSCODE');
       } else {
-        see('Could not launch iOS settings');
+        logD('Could not launch iOS settings');
       }
     }
   }
@@ -103,7 +103,7 @@ class LoginNativeState extends State<LoginNative> {
     bool supportsBiometrics = await securityService.canCheckBiometrics();
     bool isAuthSetUp = await securityService.isAuthenticationPresent();
     bool isAuthenticated = await securityService.authenticateUser();
-    if (isAuthenticated) {
+    if (isAuthenticated && mounted) {
       if (!isAuthSetUp) {
         _showSecurityWarning(context, 'no_auth_setup');
       } else if (!supportsBiometrics && !Platform.isIOS) {
@@ -143,7 +143,7 @@ class LoginNativeState extends State<LoginNative> {
         _isDeviceSupported = isDeviceSupported;
       });
     } catch (e) {
-      see(e);
+      logD(e);
     }
   }
 
@@ -194,7 +194,7 @@ class LoginNativeState extends State<LoginNative> {
       }
     } catch (e) {
       // Handle other errors
-      see(e);
+      logD(e);
     }
   }
 
@@ -276,7 +276,7 @@ Future<bool> nativeLoginFunction(BuildContext context) async {
       canCheckBiometrics = await localAuth.canCheckBiometrics;
       isDeviceSupported = await localAuth.isDeviceSupported();
     } catch (e) {
-      see(e);
+      logD(e);
     }
   }
 
@@ -350,7 +350,7 @@ Future<bool> nativeLoginFunction(BuildContext context) async {
       }
     } catch (e) {
       // Handle other errors
-      see(e);
+      logD(e);
     }
     return true;
   }

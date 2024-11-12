@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/presentation/ui/pane/wallet/page.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/services/services.dart';
@@ -140,7 +140,7 @@ class ReceivePage extends StatelessWidget {
                         label: 'SHARE',
                         onPressed: () {
                           screenshotController.capture().then((image) {
-                            see('image: ${image?.length}');
+                            logD('image: ${image?.length}');
                             if (image != null) {
                               shareQRCode(image);
                             }

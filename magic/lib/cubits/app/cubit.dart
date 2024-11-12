@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:magic/cubits/mixins.dart';
 import 'package:magic/domain/server/serverv2_client.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 part 'state.dart';
 
@@ -39,12 +39,12 @@ class AppCubit extends UpdatableCubit<AppState> {
     int? blockheight,
     bool? submitting,
   }) {
-    see('blockheight', blockheight, AnsiColors.yellow);
-    see('status', status, AnsiColors.yellow);
-    see('authenticatedAt', authenticatedAt, AnsiColors.yellow);
-    see('wasPaused', wasPaused, AnsiColors.yellow);
-    see('connection', connection, AnsiColors.yellow);
-    see('submitting', submitting, AnsiColors.yellow);
+    logW('blockheight, $blockheight');
+    logW('status, $status');
+    logW('authenticatedAt, $authenticatedAt');
+    logW('wasPaused, $wasPaused');
+    logW('connection, $connection');
+    logW('submitting, $submitting');
     if (status == AppLifecycleState.paused) {
       wasPaused = true;
     }

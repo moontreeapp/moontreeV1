@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:async';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 
 class WebSocketEndpoint {
@@ -67,7 +67,7 @@ class WebSocketConnection {
   }
 
   Future<void> sendDataToServer(String data) async {
-    see('sending', data);
+    logD('sending, $data');
     if (state is Connected || state is Reconnected) {
       socket?.send(data);
     } else {

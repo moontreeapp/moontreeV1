@@ -7,7 +7,7 @@ import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/domain/wallet/utils.dart';
 import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 part 'state.dart';
 
 class KeysCubit extends UpdatableCubit<KeysState> {
@@ -46,12 +46,12 @@ class KeysCubit extends UpdatableCubit<KeysState> {
       syncKeypairs(wifs);
       syncXPubs(xpubs, xpubsKP);
     }
-    //see(mnemonics);
+    //logD(mnemonics);
     //try {
-    //  see('-----------------------------');
-    //  see(master.derivationWallets.last.mnemonic);
-    //  see(master.derivationWallets.last.roots(Blockchain.evrmoreMain));
-    //  see(master.derivationWallets.last.roots(Blockchain.ravencoinMain));
+    //  logD('-----------------------------');
+    //  logD(master.derivationWallets.last.mnemonic);
+    //  logD(master.derivationWallets.last.roots(Blockchain.evrmoreMain));
+    //  logD(master.derivationWallets.last.roots(Blockchain.ravencoinMain));
     //} catch (e) {}
     emit(KeysState(
       xpubs: xpubs ?? state.xpubs,
@@ -122,7 +122,7 @@ class KeysCubit extends UpdatableCubit<KeysState> {
         .map((entry) => Map<String, String>.from(entry)
             .map((key, value) => MapEntry(key, value)))
         .toList();
-    see(rawXpubsKP, xpubsKP, AnsiColors.red);
+    logE('$rawXpubsKP, $xpubsKP');
     if (xpubs.isNotEmpty && xpubs != [{}]) {
       update(submitting: true);
       update(

@@ -11,7 +11,7 @@ import 'package:magic/presentation/widgets/assets/amounts.dart';
 import 'package:magic/services/services.dart' show maestro, screen;
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class TransactionsPage extends StatelessWidget {
   const TransactionsPage({super.key});
@@ -55,7 +55,7 @@ class TransactionsPage extends StatelessWidget {
                 opacity: state.clearing ? 0 : 1,
                 child: RefreshIndicator(
                     onRefresh: () async {
-                      see('refreshing transactions');
+                      logD('refreshing transactions');
                       cubits.transactions.reachedEnd = false;
                       // cubits.transactions.update(transactions: []); // causes major issue - why?
                       cubits.transactions.clearTransactions();

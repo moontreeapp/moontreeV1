@@ -5,7 +5,7 @@ import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'dart:developer';
 import 'dart:async';
 
@@ -19,8 +19,8 @@ class DeepLinkService {
     try {
       sub = AppLinks().uriLinkStream.listen(
         (Uri uri) {
-          see('Applinks got called');
-          see('????????????$uri');
+          logD('Applinks got called');
+          logD('????????????$uri');
           _handleLinks(uri);
         },
       );
