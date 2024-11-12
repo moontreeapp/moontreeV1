@@ -14,21 +14,21 @@ class Gossip {
   Gossip() {
     _subscriptions[cubits.walletLayer.key] =
         cubits.walletLayer.stream.listen((WalletLayerState state) {
-      see('GOSSIP WalletLayerCubit: ${state.active}');
+      logD('GOSSIP WalletLayerCubit: ${state.active}');
       if (state.prior?.active == null && state.active) {
-        see('wallet 1');
+        logD('wallet 1');
         cubits.pane.update(child: const WalletFeedPage());
       }
       if ((state.prior?.active == null || !state.prior!.active) &&
           !state.active) {
-        see('wallet 2');
+        logD('wallet 2');
         cubits.pane.removeChildren();
       }
       if ((state.prior?.active == true) && !state.active) {
-        see('wallet 3');
+        logD('wallet 3');
         cubits.pane.removeChildren();
       }
-      see('wallet 4');
+      logD('wallet 4');
       cubits.pane.update(child: const WalletFeedPage());
     });
   }

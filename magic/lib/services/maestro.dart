@@ -3,6 +3,7 @@ import 'package:magic/cubits/canvas/holding/cubit.dart';
 import 'package:magic/cubits/canvas/menu/cubit.dart';
 import 'package:magic/cubits/fade/cubit.dart';
 import 'package:magic/cubits/mixins.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/sections.dart';
@@ -11,7 +12,7 @@ import 'package:magic/domain/concepts/transaction.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/assets/names.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class Maestro {
   List<NavbarSection> sectionsHistory = [];
@@ -52,6 +53,26 @@ class Maestro {
       conduct(NavbarSection.wallet, remember: true);
     }
     afterBack?.call();
+  }
+
+  void prepareForTransition() {
+    if (locked) {
+      return;
+    } else {
+      locked = true;
+    }
+    cubits.app.animating = true;
+    cubits.pane.setOnBottomReached(null);
+    cubits.ignore.update(active: true);
+    cubits.fade.update(fade: FadeEvent.fadeOut);
+    cubits.navbar.update(active: false);
+  }
+
+  void finalizeActivation() async {
+    cubits.fade.update(fade: FadeEvent.fadeIn);
+    cubits.ignore.update(active: false);
+    await Future.delayed(slideDuration, () => cubits.app.animating = false);
+    locked = false;
   }
 
   void conduct(NavbarSection section, {bool remember = true}) {
@@ -184,12 +205,12 @@ class Maestro {
   /// then the scroll list action would take over and we start scrolling the
   /// list instead which is not what we want.
   //void setMaxToMiddleOnMin(double height) {
-  //  see('height: $height, screen.pane.minHeight: ${screen.pane.minHeight}');
+  //  logD('height: $height, screen.pane.minHeight: ${screen.pane.minHeight}');
   //  if (height < screen.pane.minHeight + 1) {
-  //    see('setting to mid');
+  //    logD('setting to mid');
   //    cubits.pane.update(max: screen.pane.midHeightPercent);
   //  } else if (height == screen.pane.midHeight) {
-  //    see('setting to max');
+  //    logD('setting to max');
   //    cubits.pane.update(max: screen.pane.maxHeightPercent);
   //  }
   //}
@@ -220,7 +241,7 @@ class Maestro {
     } else {
       locked = true;
     }
-    see('activating home');
+    logD('activating home');
     cubits.wallet.populateAssets(30);
     cubits.app.animating = true;
     // if pane is not in middle move it to middle first
@@ -294,20 +315,20 @@ class Maestro {
 
     /// place for testing stuff since mint is unused:
     ///
-    //see(makeMnemonic());
-    //see(cubits.keys.master.derivationWallets.last.mnemonic);
-    //see(cubits.keys.state.mnemonics);
+    //logD(makeMnemonic());
+    //logD(cubits.keys.master.derivationWallets.last.mnemonic);
+    //logD(cubits.keys.state.mnemonics);
     //cubits.keys.reset();
-    //see(cubits.keys.dump());
-    //see(cubits.keys.load());
-    //see("storage.read(key: 'key') ${await storage.read(key: 'key')}");
+    //logD(cubits.keys.dump());
+    //logD(cubits.keys.load());
+    //logD("storage.read(key: 'key') ${await storage.read(key: 'key')}");
     //cubits.keys.update(mnemonics: [makePubKey()]);
     //cubits.keys.dump();
     //DerivationWallet wallet = DerivationWallet(mnemonic: makeMnemonic());
-    //see('mnemonic: ${wallet.mnemonic}');
-    //see('entropy: ${wallet.entropy}');
-    //see('seed: ${wallet.seed}');
-    //see("storage.read(key: 'key') ${await storage.read(key: 'key')}");
+    //logD('mnemonic: ${wallet.mnemonic}');
+    //logD('entropy: ${wallet.entropy}');
+    //logD('seed: ${wallet.seed}');
+    //logD("storage.read(key: 'key') ${await storage.read(key: 'key')}");
     //cubits.toast.flash(
     //    msg: const ToastMessage(
     //  title: 'test toast',
@@ -433,10 +454,7 @@ class Maestro {
       max: screen.pane.midHeightPercent,
       min: screen.pane.midHeightPercent,
     );
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> activateSend({
@@ -477,10 +495,7 @@ class Maestro {
       address: address,
       amount: amount,
     );
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
 
     if (redirectToPreview && cubits.send.validateForm()) {
       cubits.send.send();
@@ -488,17 +503,8 @@ class Maestro {
   }
 
   Future<void> activateReceive(Blockchain blockchain) async {
-    if (locked) {
-      return;
-    } else {
-      locked = true;
-    }
-    cubits.app.animating = true;
+    prepareForTransition();
     cubits.receive.populateReceiveAddress(blockchain);
-    cubits.pane.setOnBottomReached(null);
-    cubits.ignore.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    cubits.navbar.update(active: false);
     cubits.appbar.update(
       leading: AppbarLeading.back,
       title: 'Receive',
@@ -516,23 +522,11 @@ class Maestro {
     );
     await inactivateAllBut(cubits.receive.key);
     cubits.receive.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> activateTransaction(TransactionDisplay transaction) async {
-    if (locked) {
-      return;
-    } else {
-      locked = true;
-    }
-    cubits.app.animating = true;
-    cubits.pane.setOnBottomReached(null);
-    cubits.ignore.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    cubits.navbar.update(active: false);
+    prepareForTransition();
     cubits.appbar.update(
       leading: AppbarLeading.back,
       title: 'Transaction',
@@ -553,28 +547,24 @@ class Maestro {
     );
     await inactivateAllBut(cubits.transaction.key);
     cubits.transaction.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> activatePoolOnHolding() async {
-    if (locked) {
-      return;
-    } else {
-      locked = true;
-    }
-    cubits.app.animating = true;
-    cubits.pane.setOnBottomReached(null);
-    cubits.ignore.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    cubits.navbar.update(active: false);
+    prepareForTransition();
     cubits.appbar.update(
       leading: AppbarLeading.back,
       title: 'Magic Pool',
       clearTitleChild: true,
-      onLead: activateHistory,
+      onLead: () {
+        if (cubits.pool.state.poolStatus == PoolStatus.addMore) {
+          cubits.pool.update(
+            poolStatus: PoolStatus.joined,
+          );
+        } else {
+          activateHistory();
+        }
+      },
       onTitle: cubits.appbar.none,
     );
     cubits.menu.update(active: false);
@@ -587,23 +577,11 @@ class Maestro {
     );
     await inactivateAllBut(cubits.pool.key);
     cubits.pool.update(active: true, isSubmitting: false);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> activateSwapOnHolding() async {
-    if (locked) {
-      return;
-    } else {
-      locked = true;
-    }
-    cubits.app.animating = true;
-    cubits.pane.setOnBottomReached(null);
-    cubits.ignore.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    cubits.navbar.update(active: false);
+    prepareForTransition();
     cubits.appbar.update(
       leading: AppbarLeading.close,
       title: 'Swap',
@@ -621,23 +599,11 @@ class Maestro {
     );
     await inactivateAllBut(cubits.swap.key);
     cubits.swap.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> activateManageOnHolding() async {
-    if (locked) {
-      return;
-    } else {
-      locked = true;
-    }
-    cubits.app.animating = true;
-    cubits.pane.setOnBottomReached(null);
-    cubits.ignore.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    cubits.navbar.update(active: false);
+    prepareForTransition();
     cubits.appbar.update(
       leading: AppbarLeading.close,
       title: 'Manage',
@@ -655,10 +621,7 @@ class Maestro {
     );
     await inactivateAllBut(cubits.manage.key);
     cubits.manage.update(active: true);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
-    cubits.ignore.update(active: false);
-    await Future.delayed(slideDuration, () => cubits.app.animating = false);
-    locked = false;
+    finalizeActivation();
   }
 
   Future<void> deactivateSubMenu() async {

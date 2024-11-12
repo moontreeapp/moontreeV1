@@ -77,7 +77,7 @@ String documentEndpoint(ConsentDocument consentDocument) =>
 //    await consent.given(deviceId, ConsentDocument.riskDisclosures);
 //    return true;
 //  } catch (e) {
-//    see('unable $e');
+//    logD('unable $e');
 //  }
 //  return false;
 //}

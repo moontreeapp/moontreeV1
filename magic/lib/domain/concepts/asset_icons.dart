@@ -1,5 +1,5 @@
 import 'package:magic/domain/blockchain/blockchain.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class AssetIcons {
   static const String _baseLogoPath = 'assets/asset_logos/';
@@ -70,7 +70,7 @@ class AssetIcons {
   };
 
   static bool hasCustomIcon(String assetName, Blockchain blockchain) {
-    see('Checking for custom icon: $assetName on ${blockchain.name}');
+    logD('Checking for custom icon: $assetName on ${blockchain.name}');
     final info = _assetInfo[assetName];
     return info != null && info['blockchain_name'] == blockchain.name;
   }

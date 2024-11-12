@@ -15,7 +15,7 @@ import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/animations/fading.dart';
 import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class SendPage extends StatelessWidget {
   const SendPage({super.key});
@@ -223,7 +223,7 @@ class SendContentState extends State<SendContent> {
                             amountText.text = fiatAmount.toString();
                           });
                         } catch (e) {
-                          see(e);
+                          logD(e);
                         }
                       } else {
                         amountText.text =
@@ -318,7 +318,7 @@ class SendContentState extends State<SendContent> {
                                   .invalidAmountMessages(amountText.text)
                                   .first,
                       onChanged: (value) {
-                        see(value);
+                        logD(value);
                         if (automaticConversion) {
                           return;
                         }

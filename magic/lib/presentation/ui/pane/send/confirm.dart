@@ -11,7 +11,7 @@ import 'package:magic/presentation/ui/login/native.dart'
     show nativeLoginFunction;
 import 'package:magic/presentation/widgets/assets/amounts.dart';
 import 'package:magic/services/services.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class ConfirmContent extends StatelessWidget {
   const ConfirmContent({super.key});
@@ -23,7 +23,7 @@ class ConfirmContent extends StatelessWidget {
       amount: Sats(cubits.send.state.estimate!.amount).toCoin().humanString(),
       symbol: cubits.holding.state.holding.symbol,
     );
-    see(cubits.send.state.txHashes);
+    logD(cubits.send.state.txHashes);
     //cubits.toast.flash(msg: ToastMessage(title: 'transaction id', text: : cubits.send.state.txHashes));
     cubits.send.reset();
     await cubits.wallet.populateAssets();

@@ -41,8 +41,8 @@ class ReceiveCubit extends UpdatableCubit<ReceiveState> {
     bool? isSubmitting,
     ReceiveState? prior,
   }) {
-    //see('address: ${address}');
-    //see('address: ${address?.h160AsString(Blockchain.evrmoreMain)}');
+    //logD('address: ${address}');
+    //logD('address: ${address?.h160AsString(Blockchain.evrmoreMain)}');
     emit(ReceiveState(
       active: active ?? state.active,
       asset: asset ?? state.asset,

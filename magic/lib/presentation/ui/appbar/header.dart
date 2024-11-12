@@ -16,7 +16,7 @@ import 'package:magic/presentation/widgets/animations/animations.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
 import 'package:magic/presentation/widgets/assets/status.dart';
 import 'package:magic/services/services.dart' show screen;
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class AppbarHeader extends StatelessWidget {
   const AppbarHeader({super.key});
@@ -247,15 +247,16 @@ class AppActivityWatcher extends StatelessWidget {
       buildWhen: (AppState previous, AppState current) =>
           previous.status != current.status,
       builder: (context, state) {
-        see('AppActivityWatcher: ${state.status}');
+        logD('AppActivityWatcher: ${state.status}');
         if (state.status == 'resumed') {
-          see('refreshing assets');
+          logD('refreshing assets');
           Future.delayed(const Duration(seconds: 1)).then((_) {
             cubits.wallet.populateAssets().then((value) {
-              see('refreshing holding');
+              logD('refreshing holding');
               if (cubits.holding.state.holding != const Holding.empty() &&
                   cubits.wallet.state.holdings.isNotEmpty) {
-                see('refreshing holding ${cubits.holding.state.holding.symbol} ${[
+                logD(
+                    'refreshing holding ${cubits.holding.state.holding.symbol} ${[
                   for (final x in cubits.wallet.state.holdings) x.symbol
                 ]}');
                 cubits.holding.update(
@@ -263,7 +264,7 @@ class AppActivityWatcher extends StatelessWidget {
                         .getHoldingFrom(holding: cubits.holding.state.holding));
               }
               if (cubits.transactions.state.active) {
-                see('refreshing transactions');
+                logD('refreshing transactions');
                 //cubits.transactions.clearTransactions();
                 cubits.transactions.populateAllTransactions(
                     holding: cubits.holding.state.holding);

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/src/exceptions.dart' show AlreadyListening;
 
 typedef Listener<T> = void Function(T event);
@@ -37,7 +37,7 @@ abstract class Trigger {
         } on NoSuchMethodError {
           return null;
         } catch (e) {
-          see('Unexpected Error: $e');
+          logD('Unexpected Error: $e');
         }
         return null;
       }() ??

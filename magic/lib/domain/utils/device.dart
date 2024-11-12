@@ -37,7 +37,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 Future<String> getId() async {
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   if (Platform.isAndroid) {
-    see((await deviceInfoPlugin.androidInfo).fingerprint);
+    logD((await deviceInfoPlugin.androidInfo).fingerprint);
     return (await deviceInfoPlugin.androidInfo).id;
     //return (await deviceInfoPlugin.androidInfo).fingerprint;
   } else if (Platform.isIOS) {

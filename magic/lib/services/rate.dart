@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:tuple/tuple.dart';
 import 'package:moontree_utils/moontree_utils.dart';
 
@@ -84,7 +84,7 @@ class RateGrabber implements Grabber {
     try {
       jsonBody = jsonDecode(response.body) as Map<String, dynamic>;
     } catch (e) {
-      see(e);
+      logD(e);
       throw FetchDataException('unable to get data from interpretMoontree');
     }
     return _interpretMoontreeStructure(jsonBody)?.item1; // item2 is avgtime

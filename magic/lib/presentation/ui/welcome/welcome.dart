@@ -15,7 +15,7 @@ import 'package:magic/presentation/widgets/assets/icons.dart';
 import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'package:magic/services/security.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:url_launcher/url_launcher_string.dart'; // Make sure to import the security service
 
 class WelcomeLayer extends StatelessWidget {
@@ -106,13 +106,13 @@ class WelcomeBackScreenState extends State<WelcomeBackScreen> {
       try {
         await platform.invokeMethod('openSecuritySettings');
       } on PlatformException catch (e) {
-        see("Failed to open security settings: '${e.message}'.");
+        logD("Failed to open security settings: '${e.message}'.");
       }
     } else if (Platform.isIOS) {
       if (await canLaunchUrlString('App-Prefs:root=TOUCHID_PASSCODE')) {
         await launchUrlString('App-Prefs:root=TOUCHID_PASSCODE');
       } else {
-        see('Could not launch iOS settings');
+        logD('Could not launch iOS settings');
       }
     }
   }
@@ -124,7 +124,7 @@ class WelcomeBackScreenState extends State<WelcomeBackScreen> {
       canCheckBio: supportsBiometrics,
       isAuthSetup: isAuthSetUp,
     );
-    if (isAuthenticated) {
+    if (isAuthenticated && mounted) {
       if (!isAuthSetUp) {
         _showSecurityWarning(context, 'no_auth_setup');
       } else if (!supportsBiometrics && !Platform.isIOS) {
@@ -170,7 +170,7 @@ class WelcomeBackScreenState extends State<WelcomeBackScreen> {
           //deriveInBackground();
           cubits.receive.deriveAll(Blockchain.mainnets).then((_) {
             /// scripthash incorrect here:
-            //see(
+            //logD(
             //    'second opinion',
             //    getElectrumxBalancesInBackground(
             //        scripthashes: cubits.keys.master

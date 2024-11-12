@@ -13,7 +13,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/services/services.dart';
 import 'package:magic/cubits/cubit.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 enum PairWithChromeLifeCycle {
   entering,
@@ -175,7 +175,7 @@ class PairWithChromePageState extends State<PairWithChromePage>
                       final value = event.barcodes.first.rawValue!;
                       barcode = value;
                       final msg = ScannerMessage(raw: value);
-                      see('scanner event: ${msg.raw}');
+                      logD('scanner event: ${msg.raw}');
                       //final hdPubKeys = cubits.keys.master.derivationWallets
                       //    .expand((wallet) => wallet.seedWallets.values)
                       //    .expand((seedWallet) => seedWallet.subwallets.values)
@@ -201,8 +201,8 @@ class PairWithChromePageState extends State<PairWithChromePage>
 
                       switch (msg.scannerMessageType) {
                         case ScannerMessageType.pair:
-                          see(msg.pairCode);
-                          see(hdPubKeys, kpPubKeys);
+                          logD(msg.pairCode);
+                          logD('$hdPubKeys, $kpPubKeys');
                           WebSocketEndpoint(
                             endpoint: msg.scannerMessageType.toServerEndpoint,
                             params: {
@@ -243,7 +243,7 @@ class PairWithChromePageState extends State<PairWithChromePage>
 
                         default:
                           toStage(PairWithChromeLifeCycle.exiting);
-                          see('Unknown or unsupported QR code action');
+                          logD('Unknown or unsupported QR code action');
                           break;
                       }
                       controller.stop();

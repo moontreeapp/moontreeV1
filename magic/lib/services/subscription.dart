@@ -6,7 +6,7 @@ import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/coin.dart';
 import 'package:magic/domain/utils/extensions/string.dart';
 import 'package:magic/domain/wallet/wallets.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:serverpod_client/serverpod_client.dart';
 import 'package:magic/domain/server/serverv2_client.dart' as server;
 import 'package:magic/domain/server/protocol/protocol.dart' as protocol;
@@ -32,7 +32,7 @@ class SubscriptionService {
     client.connectivityMonitor = givenMonitor;
     client.connectivityMonitor?.addListener((connected) {
       if (!connected) {
-        see('Disconnected, attempting to reconnect...');
+        logD('Disconnected, attempting to reconnect...');
         _attemptReconnect();
       }
     });
@@ -51,24 +51,21 @@ class SubscriptionService {
       client: client,
       retryEverySeconds: 1,
       listener: (StreamingConnectionHandlerState connectionState) async {
-        see('connection state: ${connectionState.status.name}');
+        logD('connection state: ${connectionState.status.name}');
         cubits.app.update(connection: connectionState.status);
         if (connectionState.status == StreamingConnectionStatus.connected) {
           while (cubits.keys.master.derivationRoots.isEmpty) {
-            see('waiting for keys', '---', AnsiColors.yellow);
+            logW('waiting for keys ---');
             await Future.delayed(const Duration(seconds: 30));
           }
-          see(
-            cubits.keys.state.mnemonics.isEmpty,
-            cubits.keys.master.derivationRoots,
-            AnsiColors.green,
-          );
+          logV(
+              '${cubits.keys.state.mnemonics.isEmpty} ${cubits.keys.master.derivationRoots}');
           onConnection?.call();
           setupListeners();
         }
       },
     );
-    see('connecting...', '', AnsiColors.green);
+    logV('connecting...');
 
     connectionHandler.connect();
   }
@@ -99,14 +96,15 @@ class SubscriptionService {
         ///   {"id":null,"chainName":"evrmore_mainnet","height":107222}
         // if height do x
         // if balance update do y, etc.
-        see(message);
+        logD(message);
         if (message is protocol.NotifyChainStatus) {
         } else if (message is protocol.NotifyChainHeight) {
           if (message.height > 0) {
             cubits.app.update(blockheight: message.height);
           }
         } else if (message is protocol.NotifyChainH160Balance) {
-          see('NotifyChainWalletBalance H160 update: ${message.symbol} ${message.satsConfirmed} ${message.satsUnconfirmed}');
+          logD(
+              'NotifyChainWalletBalance H160 update: ${message.symbol} ${message.satsConfirmed} ${message.satsUnconfirmed}');
           await triggerBalanceUpdates(
               symbol: message.symbol ??
                   message.chainName.split('_').first.toTitleCase(),
@@ -114,7 +112,8 @@ class SubscriptionService {
               satsUnconfirmed: message.satsUnconfirmed,
               chainName: message.chainName);
         } else if (message is protocol.NotifyChainWalletBalance) {
-          see('NotifyChainWalletBalance Wallet update: ${message.symbol} ${message.satsConfirmed} ${message.satsUnconfirmed}');
+          logD(
+              'NotifyChainWalletBalance Wallet update: ${message.symbol} ${message.satsConfirmed} ${message.satsUnconfirmed}');
           await triggerBalanceUpdates(
               symbol: message.symbol ??
                   message.chainName.split('_').first.toTitleCase(),
@@ -122,15 +121,15 @@ class SubscriptionService {
               satsUnconfirmed: message.satsUnconfirmed,
               chainName: message.chainName);
         } else {
-          see('unknown subscription message: ${message.runtimeType}');
+          logD('unknown subscription message: ${message.runtimeType}');
         }
       });
       // Add the subscription to the list of listeners to manage later
       listeners.add(subscription);
     } on StateError catch (e) {
-      see('listeners already setup: $e');
+      logD('listeners already setup: $e');
     } catch (e) {
-      see(e);
+      logD(e);
     }
   }
 
@@ -166,7 +165,7 @@ class SubscriptionService {
         h160s: h160s,
       ));
     } catch (e) {
-      see('Failed to send subscription: $e');
+      logD('Failed to send subscription: $e');
       // Implement proper error handling
     }
   }
@@ -176,7 +175,7 @@ class SubscriptionService {
         StreamingConnectionStatus.connected) {
       return;
     }
-    see('awaiting connection...');
+    logD('awaiting connection...');
     await _waitForConnection();
     return;
   }
@@ -204,7 +203,8 @@ class SubscriptionService {
     required int satsUnconfirmed,
     required String chainName,
   }) async {
-    see('triggerBalanceUpdates: $symbol, $satsConfirmed, $satsUnconfirmed, $chainName');
+    logD(
+        'triggerBalanceUpdates: $symbol, $satsConfirmed, $satsUnconfirmed, $chainName');
     final realSymbol = chainName.startsWith(symbol.toLowerCase())
         ? symbol == 'Evrmore'
             ? 'EVR'
@@ -220,9 +220,10 @@ class SubscriptionService {
     }
     await Future.delayed(const Duration(seconds: 1));
     await cubits.wallet.populateAssets(); // chain specific
-    see('refresh: $chainName, $symbol, ${cubits.holding.state.holding.symbol}, $realSymbol, ${cubits.transactions.state.active}');
-    see(cubits.holding.state.holding);
-    see('refreshing holding ${cubits.holding.state.holding.symbol} ${[
+    logD(
+        'refresh: $chainName, $symbol, ${cubits.holding.state.holding.symbol}, $realSymbol, ${cubits.transactions.state.active}');
+    logD(cubits.holding.state.holding);
+    logD('refreshing holding ${cubits.holding.state.holding.symbol} ${[
       for (final x in cubits.wallet.state.holdings) x.symbol
     ]}');
     if (cubits.holding.state.holding != const Holding.empty() &&

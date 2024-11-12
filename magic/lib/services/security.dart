@@ -6,7 +6,7 @@ import 'package:no_screenshot/no_screenshot.dart';
 import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/services/services.dart' show secureStorage;
 import 'package:magic/presentation/widgets/other/app_dialog.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class SecurityService {
   final LocalAuthentication _localAuth = LocalAuthentication();
@@ -53,7 +53,7 @@ class SecurityService {
       }
       return authenticated;
     } on PlatformException catch (e) {
-      see(e);
+      logD(e);
       return false;
     }
   }
@@ -79,7 +79,7 @@ class SecurityService {
         }
         return false;
       } on PlatformException catch (e) {
-        see("Failed to check USB Debugging: '${e.message}'.");
+        logD("Failed to check USB Debugging: '${e.message}'.");
         return false;
       }
     }
@@ -88,13 +88,13 @@ class SecurityService {
 
   Future<bool> disableScreenshot() async {
     bool result = await _noScreenshot.screenshotOff();
-    see('Screenshot Off: $result');
+    logD('Screenshot Off: $result');
     return result;
   }
 
   Future<bool> enableScreenshot() async {
     bool result = await _noScreenshot.screenshotOn();
-    see('Enable Screenshot: $result');
+    logD('Enable Screenshot: $result');
     return result;
   }
 }

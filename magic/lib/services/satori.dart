@@ -8,52 +8,32 @@ extension HDWalletAuthPayload on HDWallet {
         challenge ?? (DateTime.now().millisecondsSinceEpoch / 1000).toString();
     final String signature = base64Encode(sign(message));
     return {
+      'message': message,
       'address': address!,
+      'pubkey': pubKey,
       'signature': signature,
-      'timestamp': message,
     };
   }
 }
 
+//registerWallet(hdWallet: cubits.keys.master.derivationWallets.last.seedWallet(Blockchain.evrmore).externals.last)
 class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
 
-  SatoriServerClient({
-    String? url,
-  }) : url = url ?? 'https://stage.satorinet.io';
+  SatoriServerClient({this.url = 'https://stage.satorinet.io'});
 
   String _getChallenge() => DateTime.now().millisecondsSinceEpoch.toString();
 
-  // registerWallet(hdWallet: cubits.keys.master.derivationWallets.firstWhere(
-  //         (DerivationWallet wallet) => wallet
-  //             .roots(state.unsignedTransaction!.security.blockchain)
-  //             .contains(walletRoot),
-  //         orElse: () =>
-  //             throw Exception('Wallet not found for root: $walletRoot'))
-  //         .seedWallet(state.unsignedTransaction!.security.blockchain)
-  //         .subwallet(
-  //           hdIndex: derivationIndex,
-  //           exposure: exposure,
-  //         )
-  //         .keyPair;
-
-  //(cubits.keys.master.derivationWallets
-  //    .expand((m) => m.seedWallets.values.expand((s) => s.subwallets.values
-  //        .expand((subList) => subList.map((sub) => sub.address ?? ''))))
-  //    .toSet());
-
-  Future<Map<String, dynamic>> registerWallet({
-    required HDWallet hdWallet,
-    String? referrer,
-  }) async {
+  Future<Map<String, dynamic>> registerWallet(
+      {required HDWallet hdWallet}) async {
     final String challenge = _getChallenge();
     try {
       final http.Response response =
           await http.post(Uri.parse('$url/register/wallet'),
               headers: <String, String>{
                 ...hdWallet.authPayload(challenge: challenge),
-                if (referrer != null) 'referrer': referrer
+                //'referrer': 'TODO: hard code this'
               },
               body: jsonEncode({
                 "vaultpubkey": hdWallet.pubKey,

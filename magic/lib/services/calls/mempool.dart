@@ -1,6 +1,8 @@
 /// a service to hit the serverv2 transactions endpoints: mempool and confirmed
 /// compiles info to be sent to the endpoint, gets values for front end
 /// rough draft:
+library;
+
 /*
 */
 //import 'package:client_back/consent/consent_client.dart';
@@ -12,7 +14,7 @@ import 'package:magic/domain/concepts/transaction.dart';
 import 'package:magic/domain/server/serverv2_client.dart';
 import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/services/calls/server.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/moontree_utils.dart';
 
 class TransactionMempoolCall extends ServerCall {
@@ -74,7 +76,7 @@ class TransactionMempoolCall extends ServerCall {
     //TransactionView ({"id":null,"error":null,"hash":"decode('5htuA5MpcIzrZUVxXJhG/Wpsj1wMYxO96jkzL5vc64M=', 'base64')","datetime":"-0001-01-01T00:00:00.000Z","fee":501600,"vsize":456,"height":-1,"containsAssets":true,"consolidation":false,"iProvided":37673075821,"iReceived":37672574221,"issueMainBurned":0,"reissueBurned":0,"issueSubBurned":0,"issueUniqueBurned":0,"issueMessageBurned":0,"issueQualifierBurned":0,"issueSubQualifierBurned":0,"issueRestrictedBurned":0,"addTagBurned":0,"burnBurned":0,"chain":null,"symbol":null})
     if (history.length == 1 && history.first.error != null) {
       // handle
-      see('history ERROR: ${history.first.error}');
+      logD('history ERROR: ${history.first.error}');
       return [];
     }
 
@@ -85,7 +87,7 @@ class TransactionMempoolCall extends ServerCall {
         txView.datetime = DateTime.now();
       }
     }
-    see('mempool: $history');
+    logD('mempool: $history');
     return translate(history, blockchain);
   }
 

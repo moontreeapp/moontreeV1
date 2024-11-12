@@ -2,17 +2,18 @@ import 'dart:typed_data';
 import 'package:convert/convert.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/address.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 
 class Testing {
   static void test1() {
     String address = "EJSooxjk5H6ha24WNJp3k9xuFZMoHpQv64";
     try {
       Uint8List h160 = addressToH160(address);
-      see('h160: ${hex.encode(h160)}');
-      see('backtoAddres: ${Blockchain.evrmoreMain.addressFromH160String(hex.encode(h160))}');
+      logD('h160: ${hex.encode(h160)}');
+      logD(
+          'backtoAddres: ${Blockchain.evrmoreMain.addressFromH160String(hex.encode(h160))}');
     } catch (e) {
-      see('Error: $e');
+      logD('Error: $e');
     }
   }
 
@@ -94,37 +95,37 @@ class Testing {
       '84b8bcf4d468bd88a5f64ecafd4259c89b334b34',
       'fd8af1b20016ca870ea0f31cb46f152f6ab20368',
     ]) {
-      see(Blockchain.evrmoreMain.addressFromH160String(h160));
+      logD(Blockchain.evrmoreMain.addressFromH160String(h160));
     }
     //for (var i in range(42)) {
-    //  see('deriving $i');
+    //  logD('deriving $i');
     //  cubits.receive
     //      .populateAddresses(Blockchain.evrmoreMain, overrideIndex: i);
     //}
-    //see(
+    //logD(
     //    'pubkey ${cubits.keys.master.derivationWallets.last.pubkey(Blockchain.evrmoreMain)}');
-    //see(
+    //logD(
     //    'roots  ${cubits.keys.master.derivationWallets.last.roots(Blockchain.evrmoreMain)}');
-    //see('externals');
-    //see(cubits.keys.master.derivationWallets.last.seedWallets);
-    //see(cubits.keys.master.derivationWallets.first
+    //logD('externals');
+    //logD(cubits.keys.master.derivationWallets.last.seedWallets);
+    //logD(cubits.keys.master.derivationWallets.first
     //    .seedWallet(Blockchain.evrmoreMain)
     //    .externals
     //    .length);
     //for (var x in cubits.keys.master.derivationWallets.first
     //    .seedWallet(Blockchain.evrmoreMain)
     //    .externals) {
-    //  see('address ${x.address}');
-    //  see('h160    ${addressToH160(x.address!)}');
-    //  see('h160s   ${hex.encode(addressToH160(x.address!))}');
+    //  logD('address ${x.address}');
+    //  logD('h160    ${addressToH160(x.address!)}');
+    //  logD('h160s   ${hex.encode(addressToH160(x.address!))}');
     //}
-    //see('internals');
+    //logD('internals');
     //for (var x in cubits.keys.master.derivationWallets.first
     //    .seedWallet(Blockchain.evrmoreMain)
     //    .externals) {
-    //  see('address ${x.address}');
-    //  see('h160    ${addressToH160(x.address!)}');
-    //  see('h160s   ${hex.encode(addressToH160(x.address!))}');
+    //  logD('address ${x.address}');
+    //  logD('h160    ${addressToH160(x.address!)}');
+    //  logD('h160s   ${hex.encode(addressToH160(x.address!))}');
     //}
   } //
 } //

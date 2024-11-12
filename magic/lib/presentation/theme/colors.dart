@@ -99,88 +99,88 @@ class AppColors {
   static const Color androidSystemBar = Colors.black;
   static const Color androidNavigationBar = Colors.black;
 
-  /** needed?
+/** needed?
 
-  static const Color textFieldBackground = Color(0xFFE5E5E5);
-  //static const Color success = Color(0xFF00F57E);
-  static const Color blue400 = Color(0xFF369DFF);
-  static const Color blue60 = Color(0xFF86C4FF);
-  static const Color blue38 = Color(0xFFB3DAFF);
-  static const Color blue8 = Color(0xFFEFF7FF);
-  static const Color blue3 = Color(0xFFF9FCFF);
-  static const Color buttonTab = Color(0xFF9E9E9E);
-  static const Color buttonTabs = Color(0xFFF5F5F5);
-  static const Color offTransparent = Color(0x01000000);
-  static const Color errorlight = Color(0xFFFF9390);
-  static const Color lightGreen = Color(0xFF9CCC65);
-  static const Color lime = Color(0xFFD4E157);
-  static const Color yellow = Color(0xFFFFEE58);
-  static const Color snackBar = Color(0xFF212121);
-  static const Color logoGreen = Color(0xFF94DF3F);
-  static const Color logoBlue = Color(0xFF54A3E3);
-  // Colors.white.withAlpha(12) // .04*255 = 10
-  static const Color offBlack = black87;
-  static const Color offWhite = white87;
+    static const Color textFieldBackground = Color(0xFFE5E5E5);
+    //static const Color success = Color(0xFF00F57E);
+    static const Color blue400 = Color(0xFF369DFF);
+    static const Color blue60 = Color(0xFF86C4FF);
+    static const Color blue38 = Color(0xFFB3DAFF);
+    static const Color blue8 = Color(0xFFEFF7FF);
+    static const Color blue3 = Color(0xFFF9FCFF);
+    static const Color buttonTab = Color(0xFF9E9E9E);
+    static const Color buttonTabs = Color(0xFFF5F5F5);
+    static const Color offTransparent = Color(0x01000000);
+    static const Color errorlight = Color(0xFFFF9390);
+    static const Color lightGreen = Color(0xFF9CCC65);
+    static const Color lime = Color(0xFFD4E157);
+    static const Color yellow = Color(0xFFFFEE58);
+    static const Color snackBar = Color(0xFF212121);
+    static const Color logoGreen = Color(0xFF94DF3F);
+    static const Color logoBlue = Color(0xFF54A3E3);
+    // Colors.white.withAlpha(12) // .04*255 = 10
+    static const Color offBlack = black87;
+    static const Color offWhite = white87;
 
-  static const List<Color> whites = <Color>[
+    static const List<Color> whites = <Color>[
     white12,
     white24,
     white38,
     white60,
     white87,
     white,
-  ];
+    ];
 
-  static const List<Color> blacks = <Color>[
+    static const List<Color> blacks = <Color>[
     black12,
     black24,
     black38,
     black60,
     black87,
     black,
-  ];
+    ];
 
-  static const List<int> lightPrimaryNumbers = <int>[38, 60];
-  static const List<int> whiteNumbers = <int>[12, 38, 60, 87, 100];
-  static const List<int> blackNumbers = <int>[12, 38, 60, 87, 100];
+    static const List<int> lightPrimaryNumbers = <int>[38, 60];
+    static const List<int> whiteNumbers = <int>[12, 38, 60, 87, 100];
+    static const List<int> blackNumbers = <int>[12, 38, 60, 87, 100];
 
-  static const Color androidSystemBar =
-      Colors.black; // (0xFF3F7442); //primary.withOpacity(1 - .12);
-  static const Color androidNavigationBar =
-      Colors.black; //(0xFF3F7442); //primary.withOpacity(1 - .60);
-  //Color(0xFF384277); //primary.withOpacity(1 - .38);
-  //static Color scrim = black.withOpacity(1 - .38);
-  static const Color scrim = black24;
-  static Color scrimLight = white.withOpacity(1 - .12);
+    static const Color androidSystemBar =
+    Colors.black; // (0xFF3F7442); //primary.withOpacity(1 - .12);
+    static const Color androidNavigationBar =
+    Colors.black; //(0xFF3F7442); //primary.withOpacity(1 - .60);
+    //Color(0xFF384277); //primary.withOpacity(1 - .38);
+    //static Color scrim = black.withOpacity(1 - .38);
+    static const Color scrim = black24;
+    static Color scrimLight = white.withOpacity(1 - .12);
 
-  static List<int> tooClose(int index) =>
-      <int, List<int>>{
-        1: <int>[15],
-        5: <int>[8, 6],
-        6: <int>[7, 9],
-        7: <int>[9, 10],
-        8: <int>[5],
-        9: <int>[5, 6, 7],
-        10: <int>[7],
-        13: <int>[11],
-      }[index] ??
-      <int>[];
+    static List<int> tooClose(int index) =>
+    <int, List<int>>{
+    1: <int>[15],
+    5: <int>[8, 6],
+    6: <int>[7, 9],
+    7: <int>[9, 10],
+    8: <int>[5],
+    9: <int>[5, 6, 7],
+    10: <int>[7],
+    13: <int>[11],
+    }[index] ??
+    <int>[];
 
-  static List<int> tooClash(int index) =>
-      <int, List<int>>{
-        0: <int>[5, 6, 8],
-        5: <int>[0, 1, 15],
-        6: <int>[0, 1, 14, 15],
-        7: <int>[0, 1, 14, 15],
-        8: <int>[0, 1, 15],
-        9: <int>[15],
-        10: <int>[14],
-        14: <int>[6, 7],
-        15: <int>[5, 6, 7, 8],
-      }[index] ??
-      <int>[];
+    static List<int> tooClash(int index) =>
+    <int, List<int>>{
+    0: <int>[5, 6, 8],
+    5: <int>[0, 1, 15],
+    6: <int>[0, 1, 14, 15],
+    7: <int>[0, 1, 14, 15],
+    8: <int>[0, 1, 15],
+    9: <int>[15],
+    10: <int>[14],
+    14: <int>[6, 7],
+    15: <int>[5, 6, 7, 8],
+    }[index] ??
+    <int>[];
 
-  static List<int> rgb(Color color) =>
-      <int>[color.red, color.green, color.blue];
-  */
+    static List<int> rgb(Color color) =>
+    <int>[color.red, color.green, color.blue];
+ */
 }

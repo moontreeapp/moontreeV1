@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/presentation/ui/welcome/pair_with_chrome.dart';
-import 'package:magic/utils/log.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class QRViewable extends StatefulWidget {
@@ -20,15 +20,15 @@ class QRViewableState extends State<QRViewable> with WidgetsBindingObserver {
 
   void _handleBarcode(BarcodeCapture event) {
     try {
-      see(event.barcodes.first.rawValue);
+      logD(event.barcodes.first.rawValue);
       // Your existing processing logic
-      see(event);
-      see(event.barcodes);
-      see(event.barcodes.first.rawValue);
-      see(event.image);
-      see(event.raw);
+      logD(event);
+      logD(event.barcodes);
+      logD(event.barcodes.first.rawValue);
+      logD(event.image);
+      logD(event.raw);
     } catch (e) {
-      see('Error processing barcode: $e');
+      logD('Error processing barcode: $e');
     }
   }
 
@@ -99,12 +99,12 @@ class QRViewableState extends State<QRViewable> with WidgetsBindingObserver {
                   amount: barcode?.sendAmount?.trim(),
                 );
                 cubits.send.update(scanActive: false);
-                see(cubits.send.state.address);
-                see(event);
-                see(event.barcodes);
-                see(event.barcodes.first.rawValue);
-                see(event.image);
-                see(event.raw);
+                logD(cubits.send.state.address);
+                logD(event);
+                logD(event.barcodes);
+                logD(event.barcodes.first.rawValue);
+                logD(event.image);
+                logD(event.raw);
               }
               setState(() {
                 barcode =
