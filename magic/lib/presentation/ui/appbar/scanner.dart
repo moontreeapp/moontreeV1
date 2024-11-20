@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/pane/wallet/cubit.dart';
 import 'package:magic/domain/wallet/sign.dart';
+import 'package:magic/domain/wallet/signer.dart';
 //import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/ui/welcome/pair_with_chrome.dart';
@@ -47,6 +48,7 @@ class ScannerButton extends StatelessWidget {
                 Blockchain.evrmoreMain.network),
             em);
         logWTF(s);
+        logWTF(signer());
       },
       //onTap: () =>
       //cubits.toast.flash(
