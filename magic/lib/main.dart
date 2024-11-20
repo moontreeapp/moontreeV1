@@ -19,6 +19,10 @@ import 'package:magic/services/services.dart';
 import 'package:magic/services/security.dart';
 //import 'package:magic/domain/blockchain/blockchain.dart';
 //import 'package:wallet_utils/wallet_utils.dart';
+//final kpWallet = KPWallet.fromWIF(
+//    'L1pJZ8Uw2nSNjjvRSCSAwoUfugMaknTbFAU5yRPQ1cJHvXVaM7FD',
+//    Blockchain.evrmoreMain.network);
+//print(kpWallet.sign('1731910549.8774903'));
 
 /// to remove stupid overscroll glow indicator
 class NoGlowScrollBehavior extends ScrollBehavior {
@@ -273,10 +277,6 @@ class _MaestroLayerIOSState extends State<MaestroLayerIOS> {
     } else {
       _initializeServices(context, constraints.maxHeight, constraints.maxWidth);
     }
-    //final kpWallet = KPWallet.fromWIF(
-    //    'L1pJZ8Uw2nSNjjvRSCSAwoUfugMaknTbFAU5yRPQ1cJHvXVaM7FD',
-    //    Blockchain.evrmoreMain.network);
-    //print(kpWallet.sign('1731910549.8774903'));
     final scaffold = Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.background,

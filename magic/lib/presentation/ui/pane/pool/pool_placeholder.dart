@@ -46,7 +46,7 @@ class _PoolContentPlaceholderState extends State<PoolContentPlaceholder>
         children: [
           // Placeholder for Amount TextField
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: _PlaceholderItem(animation: _animation),
           ),
           // Placeholder for Join button

@@ -58,14 +58,14 @@ class SubscriptionService {
             logW('waiting for keys ---');
             await Future.delayed(const Duration(seconds: 30));
           }
-          logV(
+          logI(
               '${cubits.keys.state.mnemonics.isEmpty} ${cubits.keys.master.derivationRoots}');
           onConnection?.call();
           setupListeners();
         }
       },
     );
-    logV('connecting...');
+    logI('connecting...');
 
     connectionHandler.connect();
   }

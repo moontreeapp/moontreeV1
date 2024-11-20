@@ -100,15 +100,15 @@ class PoolContentState extends State<PoolContent> {
                   ? {
                       if (widget.addMore)
                         {
-                          cubits.pool.update(
-                            poolStatus: PoolStatus.joined,
+                          cubits.pool.addMoreToPool(
+                            amount: amountText.text,
                           )
                         }
                       else
                         {
-                          cubits.pool.update(
-                            poolStatus: PoolStatus.joined,
-                          )
+                          cubits.pool.joinPool(
+                            amount: amountText.text,
+                          ),
                         }
                     }
                   : cubits.toast.flash(
@@ -264,9 +264,7 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
                   title: 'Leave Pool',
                   content: 'Are you sure you want to leave the pool?',
                   onYes: () {
-                    cubits.pool.update(
-                      poolStatus: PoolStatus.notJoined,
-                    );
+                    cubits.pool.leavePool();
                     Navigator.of(context).pop();
                   },
                 );

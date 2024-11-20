@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:wallet_utils/wallet_utils.dart';
+import '../utils/logger.dart';
 
 extension HDWalletAuthPayload on HDWallet {
   Map<String, String> authPayload({String? challenge}) {
@@ -25,8 +26,9 @@ class SatoriServerClient {
 
   String _getChallenge() => DateTime.now().millisecondsSinceEpoch.toString();
 
-  Future<Map<String, dynamic>> registerWallet(
-      {required HDWallet hdWallet}) async {
+  Future<Map<String, dynamic>> registerWallet({
+    required HDWallet hdWallet,
+  }) async {
     final String challenge = _getChallenge();
     try {
       final http.Response response =
@@ -43,13 +45,13 @@ class SatoriServerClient {
                 //"alias": ''
               }));
       if (response.statusCode >= 400) {
-        print('Unable to checkin: ${response.body}');
+        logE('Unable to checkin: ${response.body}');
         return {'ERROR': response.body};
       }
       lastCheckin = DateTime.now().millisecondsSinceEpoch / 1000;
       return jsonDecode(response.body);
-    } catch (e) {
-      print('Error during checkin: $e');
+    } catch (e, st) {
+      logE('Error during checkin: $e $st');
       return {'ERROR': e.toString()};
     }
   }

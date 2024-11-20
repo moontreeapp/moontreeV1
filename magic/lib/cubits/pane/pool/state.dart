@@ -5,6 +5,7 @@ enum PoolStatus { notJoined, joined, addMore }
 class PoolState with EquatableMixin, PriorActiveStateMixin {
   final bool active;
   final String amount;
+  final String poolAddress;
   final bool isSubmitting;
   final PoolStatus poolStatus;
   final PoolState? prior;
@@ -12,6 +13,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
   const PoolState({
     this.active = false,
     this.amount = '',
+    this.poolAddress = '',
     this.isSubmitting = false,
     this.poolStatus = PoolStatus.notJoined,
     this.prior,
@@ -21,6 +23,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
   List<Object?> get props => <Object?>[
         active,
         amount,
+        poolAddress,
         isSubmitting,
         poolStatus,
         prior,
@@ -33,6 +36,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
   PoolState get withoutPrior => PoolState(
         active: active,
         amount: amount,
+        poolAddress: poolAddress,
         isSubmitting: isSubmitting,
         poolStatus: poolStatus,
         prior: null,
