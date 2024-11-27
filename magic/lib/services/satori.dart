@@ -1,58 +1,55 @@
+import 'package:bip32/src/utils/wif.dart' as wif;
+import 'package:magic/domain/wallet/extended_wallet_base.dart';
+import 'package:wallet_utils/wallet_utils.dart';
+import 'package:web3dart/crypto.dart';
+import 'package:web3dart/web3dart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:wallet_utils/wallet_utils.dart';
 import '../utils/logger.dart';
 
-extension HDWalletAuthPayload on HDWallet {
-  Map<String, String> authPayload({String? challenge}) {
-    final String message =
-        challenge ?? (DateTime.now().millisecondsSinceEpoch / 1000).toString();
-    final String signature = base64Encode(sign(message));
-    return {
-      'message': message,
-      'address': address!,
-      'pubkey': pubKey,
-      'signature': signature,
-    };
-  }
-}
-
-//registerWallet(hdWallet: cubits.keys.master.derivationWallets.last.seedWallet(Blockchain.evrmore).externals.last)
 class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
 
   SatoriServerClient({this.url = 'https://stage.satorinet.io'});
 
-  String _getChallenge() => DateTime.now().millisecondsSinceEpoch.toString();
+  String convertWIFToHex(String wifKey) {
+    final decoded = wif.decode(wifKey);
+    return bytesToHex(decoded.privateKey);
+  }
 
-  Future<Map<String, dynamic>> registerWallet({
-    required HDWallet hdWallet,
+  Future<bool> registerWallet({
+    required KPWallet kpWallet,
   }) async {
-    final String challenge = _getChallenge();
     try {
-      final http.Response response =
-          await http.post(Uri.parse('$url/register/wallet'),
-              headers: <String, String>{
-                ...hdWallet.authPayload(challenge: challenge),
-                //'referrer': 'TODO: hard code this'
-              },
-              body: jsonEncode({
-                "vaultpubkey": hdWallet.pubKey,
-                "vaultaddress": hdWallet.address!,
-                //"ethaddress": we should derive an eth address from the wallet private key,
-                "rewardaddress": hdWallet.address!,
-                //"alias": ''
-              }));
+      final String privateKey = kpWallet.wif!;
+      final String privateKeyHex = convertWIFToHex(privateKey);
+      final EthPrivateKey ethPrivateKey = EthPrivateKey.fromHex(privateKeyHex);
+
+      final EthereumAddress ethAddress = ethPrivateKey.address;
+      var body = {
+        "vaultpubkey": kpWallet.pubKey,
+        "vaultaddress": kpWallet.address,
+        "ethaddress": ethAddress.hex,
+        "rewardaddress": kpWallet.address,
+      };
+
+      Map<String, String> headers = kpWallet.authPayload();
+
+      final http.Response response = await http.post(
+        Uri.parse('$url/register/wallet'),
+        headers: headers,
+        body: jsonEncode(body),
+      );
       if (response.statusCode >= 400) {
         logE('Unable to checkin: ${response.body}');
-        return {'ERROR': response.body};
+        return false;
       }
-      lastCheckin = DateTime.now().millisecondsSinceEpoch / 1000;
-      return jsonDecode(response.body);
+      lastCheckin = DateTime.now().toUtc().millisecondsSinceEpoch / 1000;
+      return response.body == 'OK';
     } catch (e, st) {
-      logE('Error during checkin: $e $st');
-      return {'ERROR': e.toString()};
+      logE('Error during checkin: $e\n$st');
+      return false;
     }
   }
 }

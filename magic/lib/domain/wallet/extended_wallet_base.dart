@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:convert/convert.dart' show hex;
+import 'package:magic/domain/wallet/sign/sign_message.dart';
 import 'package:wallet_utils/wallet_utils.dart' show WalletBase, ECPair;
 import 'package:wallet_utils/wallet_utils.dart' as wu;
 
@@ -18,5 +19,33 @@ extension ExtendedWalletBase on WalletBase {
 
   ECPair get keyPair {
     return ECPair.fromWIF(wif!, network);
+  }
+
+  /// Signs a message with the private key of the wallet.
+  String signCompact(String message) {
+    return SignMessage(
+      message: message,
+      prefix: network.messagePrefix,
+    ).signCompact(privateKeyWIF: wif);
+  }
+
+  String _getChallenge() =>
+      (DateTime.now().toUtc().millisecondsSinceEpoch / 1000).toString();
+
+  /// Returns a payload for authentication.
+  ///
+  /// The payload contains [message], [address], [publicKey], and [signature]
+  /// to be used for authenticating the wallet.
+  Map<String, String> authPayload() {
+    final String message = _getChallenge();
+
+    var sig = signCompact(message);
+    var data = <String, String>{
+      'message': message,
+      'address': address!,
+      'pubkey': pubKey!,
+      'signature': sig,
+    };
+    return data;
   }
 }

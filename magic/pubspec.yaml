@@ -83,6 +83,9 @@ dependencies:
   path_provider: ^2.1.5
   app_links: ^6.3.2
   logger: ^2.4.0
+  ecdsa: ^0.1.2
+  elliptic: ^0.3.11
+  web3dart: ^2.7.3
 
 dependency_overrides:
   collection: ^1.19.1

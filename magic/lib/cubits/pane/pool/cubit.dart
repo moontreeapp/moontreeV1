@@ -75,10 +75,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       await Future.delayed(fadeDuration);
       update(isSubmitting: true);
       cubits.fade.update(fade: FadeEvent.fadeIn);
-      HDWallet hdWallet = cubits.keys.master.derivationWallets.first
-          .seedWallet(Blockchain.evrmoreMain)
-          .externals
-          .last;
+
       final privateKey = cubits.keys.master.derivationWallets.last
           .seedWallet(Blockchain.evrmoreMain)
           .subwallet(
@@ -87,20 +84,26 @@ class PoolCubit extends UpdatableCubit<PoolState> {
           )
           .keyPair
           .toWIF();
-      SatoriServerClient satori = SatoriServerClient();
-      await Future.delayed(Duration(seconds: 5));
-      var response = await satori.registerWallet(
-        hdWallet: hdWallet,
+
+      KPWallet kpWallet = KPWallet.fromWIF(
+        privateKey,
+        Blockchain.evrmoreMain.network,
       );
-      if (response.containsKey('ERROR')) {
-        update(isSubmitting: false);
-        return;
-      }
+
       var nextAddress = cubits.keys.master.derivationWallets.first
           .seedWallet(Blockchain.evrmoreMain)
           .externals
           .lastOrNull
           ?.address;
+      SatoriServerClient satori = SatoriServerClient();
+      var response = await satori.registerWallet(
+        kpWallet: kpWallet,
+      );
+      if (response == false) {
+        update(isSubmitting: false);
+        return;
+      }
+
       var satoriMagicPoolString =
           await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
       var satoriMagicPool =
@@ -110,11 +113,10 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       logWTF(satoriMagicPool);
       if (satoriMagicPool == null ||
           satoriMagicPool['satori_magic_pool'] == null) {
-        logW('No private key found, generating new one');
         await secureStorage.write(
           key: SecureStorageKey.satoriMagicPool.key(),
           value: jsonEncode({
-            "satori_magic_pool": privateKey,
+            "satori_magic_pool": kpWallet.wif,
             "address": nextAddress,
           }),
         );
@@ -123,7 +125,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
         amount: amount,
         poolAddress: nextAddress,
       );
-      await prepareForSend();
+      await prepareForSend(poolWif: kpWallet.wif);
       cubits.fade.update(fade: FadeEvent.fadeIn);
     } catch (e, st) {
       logE('$e $st');
@@ -201,12 +203,13 @@ class PoolCubit extends UpdatableCubit<PoolState> {
           title: 'Error',
           text: 'Unable to generate transaction',
         ));
+        update(isSubmitting: false);
       } else {
         await sendAmount(isLeavingPool: isLeavingPool);
       }
-    } catch (e) {
+    } catch (e, st) {
       update(isSubmitting: false);
-      logE(e);
+      logE('$e $st');
     }
   }
 
