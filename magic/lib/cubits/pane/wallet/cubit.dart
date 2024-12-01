@@ -5,13 +5,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:magic/cubits/cubit.dart';
 import 'package:magic/cubits/mixins.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/money/rate.dart';
 import 'package:magic/domain/concepts/numbers/coin.dart';
 import 'package:magic/domain/concepts/numbers/fiat.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/sats.dart';
+import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/domain/utils/extensions/list.dart';
+import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/utils/range.dart';
 import 'package:magic/services/calls/holdings.dart';
@@ -37,12 +40,16 @@ class WalletCubit extends UpdatableCubit<WalletState> {
 
   @override
   String get key => 'walletFeed';
+
   @override
   void reset() => emit(const WalletState());
+
   @override
   void setState(WalletState state) => emit(state);
+
   @override
   void hide() => update(active: false);
+
   @override
   void refresh() {
     if (state.active) {
@@ -53,6 +60,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
 
   @override
   void activate() => update(active: true);
+
   @override
   void deactivate() => update(active: false);
 
@@ -112,6 +120,10 @@ class WalletCubit extends UpdatableCubit<WalletState> {
     // remember to order by currency first, amount second, alphabetical third
     update(isSubmitting: true);
     logD('populateAssets');
+    var storedDataString =
+        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
+    var storedData = jsonDecode(storedDataString ?? '{}');
+    String? privateKey = storedData['satori_magic_pool'];
     final holdings = setCorrespondingFlag(_sort(_newRateThese(
             symbol: 'EVR',
             rate: await rates.getRateOf('EVR'),
@@ -129,6 +141,38 @@ class WalletCubit extends UpdatableCubit<WalletState> {
               keypairWallets: cubits.keys.master.keypairWallets,
             ).call())));
     logWTF('holdings: $holdings');
+    final poolHolding = _newRateThese(
+        symbol: 'EVR',
+        rate: await rates.getRateOf('EVR'),
+        holdings: await HoldingBalancesCall(
+          blockchain: Blockchain.evrmoreMain,
+          derivationWallets: [],
+          keypairWallets: privateKey != null
+              ? [KeypairWallet(wif: privateKey)]
+              : cubits.keys.master.keypairWallets,
+        ).call());
+
+    Holding satoriHolding = poolHolding.firstWhere(
+      (element) => element.symbol == 'SATORI',
+      orElse: () => Holding(
+        name: 'Default',
+        symbol: 'SATORI',
+        blockchain: Blockchain.evrmoreMain,
+        sats: Sats(0),
+        metadata: HoldingMetadata(
+          divisibility: Divisibility(8),
+          reissuable: false,
+          supply: Sats.fromCoin(Coin(coin: 0)),
+        ),
+      ),
+    );
+
+    if (satoriHolding.sats.value > 0) {
+      cubits.pool.update(
+        poolStatus: PoolStatus.joined,
+        pooHolding: satoriHolding,
+      );
+    }
     if (holdings.isNotEmpty) {
       update(holdings: [], isSubmitting: false);
       update(holdings: holdings, isSubmitting: false);
@@ -264,6 +308,8 @@ class WalletCubit extends UpdatableCubit<WalletState> {
 class MainAdminPair {
   final Holding? main;
   final Holding? admin;
+
   const MainAdminPair({required this.main, required this.admin});
+
   bool get full => main != null && admin != null;
 }

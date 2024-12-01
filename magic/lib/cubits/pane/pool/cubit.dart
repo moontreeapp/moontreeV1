@@ -1,6 +1,7 @@
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/blockchain/exposure.dart';
+import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/coin.dart';
 import 'package:magic/domain/concepts/numbers/sats.dart';
 import 'package:magic/domain/concepts/send.dart';
@@ -54,6 +55,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
   void update({
     bool? active,
     String? amount,
+    Holding? pooHolding,
     String? poolAddress,
     bool? isSubmitting,
     PoolStatus? poolStatus,
@@ -62,6 +64,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     emit(PoolState(
       active: active ?? state.active,
       amount: amount ?? state.amount,
+      poolHolding: pooHolding ?? state.poolHolding,
       poolAddress: poolAddress ?? state.poolAddress,
       isSubmitting: isSubmitting ?? state.isSubmitting,
       poolStatus: poolStatus ?? state.poolStatus,
@@ -71,10 +74,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
 
   Future<void> joinPool({required String amount}) async {
     try {
-      cubits.fade.update(fade: FadeEvent.fadeOut);
-      await Future.delayed(fadeDuration);
-      update(isSubmitting: true);
-      cubits.fade.update(fade: FadeEvent.fadeIn);
+      await _fadeOutAndIn();
 
       final privateKey = cubits.keys.master.derivationWallets.last
           .seedWallet(Blockchain.evrmoreMain)
@@ -166,92 +166,115 @@ class PoolCubit extends UpdatableCubit<PoolState> {
           Coin.fromString(state.amount.replaceAll(',', '')).toSats().value;
       final sendAll = sendSats == cubits.holding.state.holding.sats.value &&
           cubits.holding.state.holding.isCurrency;
-      cubits.send.update(
-          sendRequest: SendRequest(
-        sendAll: sendAll,
-        sendAddress: state.poolAddress,
-        holding: cubits.holding.state.holding.coin.toDouble(),
-        visibleAmount: state.amount,
-        sendAmountAsSats: sendSats,
-        feeRate: cheapFee,
-      ));
+      final leaveSats = Coin.fromString(
+              state.poolHolding!.coin.toString().replaceAll(',', ''))
+          .toSats()
+          .value;
 
       if (isLeavingPool) {
+        final changeAddress = cubits.keys.master.derivationWallets.first
+            .seedWallet(Blockchain.evrmoreMain)
+            .externals
+            .lastOrNull
+            ?.address;
+        cubits.send.update(
+          sendRequest: SendRequest(
+            sendAll: true,
+            sendAddress: changeAddress!,
+            holding: state.poolHolding?.coin.toDouble() ?? 0,
+            visibleAmount: state.poolHolding?.coin.toString() ?? '',
+            sendAmountAsSats: leaveSats,
+            feeRate: cheapFee,
+          ),
+          address: changeAddress,
+        );
         await setPoolExitTransaction(
           symbol: cubits.holding.state.holding.symbol,
           blockchain: cubits.holding.state.holding.blockchain,
           poolWif: poolWif ?? '',
         );
       } else {
+        cubits.send.update(
+          sendRequest: SendRequest(
+            sendAll: sendAll,
+            sendAddress: state.poolAddress,
+            holding: cubits.holding.state.holding.coin.toDouble(),
+            visibleAmount: state.amount,
+            sendAmountAsSats: sendSats,
+            feeRate: cheapFee,
+          ),
+          address: state.poolAddress,
+        );
         await cubits.send.setUnsignedTransaction(
           sendAllCoinFlag: sendAll,
           symbol: cubits.holding.state.holding.symbol,
           blockchain: cubits.holding.state.holding.blockchain,
         );
       }
-      await cubits.send.signUnsignedTransaction();
+      var success = await cubits.send.signUnsignedTransaction();
+      logI('signing success: $success');
       final validateMsg = await cubits.send.verifyTransaction();
-      logD(validateMsg);
       if (!validateMsg.item1) {
         cubits.send.update(
-            signedTransactions: [],
-            txHashes: [],
-            removeUnsignedTransaction: true,
-            removeEstimate: true);
+          signedTransactions: [],
+          txHashes: [],
+          removeUnsignedTransaction: true,
+          removeEstimate: true,
+        );
         cubits.toast.flash(
-            msg: const ToastMessage(
-          title: 'Error',
-          text: 'Unable to generate transaction',
-        ));
+          msg: const ToastMessage(
+            title: 'Error',
+            text: 'Unable to generate transaction',
+          ),
+        );
         update(isSubmitting: false);
       } else {
         await sendAmount(isLeavingPool: isLeavingPool);
       }
     } catch (e, st) {
       update(isSubmitting: false);
+      cubits.toast.flash(
+        msg: const ToastMessage(
+          title: 'Error',
+          text: 'Some error occurred',
+        ),
+      );
       logE('$e $st');
     }
   }
 
   Future<void> addMoreToPool({required String amount}) async {
-    cubits.fade.update(fade: FadeEvent.fadeOut);
-    await Future.delayed(fadeDuration);
-    update(isSubmitting: true);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
+    try {
+      await _fadeOutAndIn();
 
-    var storedDataString =
-        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
-    var storedData = jsonDecode(storedDataString ?? '');
-    var toAddress = cubits.keys.master.derivationWallets.first
-        .seedWallet(Blockchain.evrmoreMain)
-        .externals
-        .lastOrNull
-        ?.address;
+      var storedDataString =
+          await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
+      var storedData = jsonDecode(storedDataString ?? '');
+      String poolAddress = storedData['address'];
 
-    if (storedData == null ||
-        !storedData.containsKey('address') ||
-        !storedData.containsKey('satori_magic_pool') ||
-        toAddress == null) {
-      logE('Stored data is incomplete or missing');
+      if (storedData == null ||
+          !storedData.containsKey('address') ||
+          !storedData.containsKey('satori_magic_pool')) {
+        logE('Stored data is incomplete or missing');
 
+        update(isSubmitting: false);
+        return;
+      }
+      update(
+        amount: amount,
+        poolAddress: poolAddress,
+      );
+      await prepareForSend();
       update(isSubmitting: false);
-      return;
+      cubits.fade.update(fade: FadeEvent.fadeIn);
+    } catch (e) {
+      logE(e);
     }
-    update(
-      amount: amount,
-      poolAddress: toAddress,
-    );
-    await prepareForSend();
-    update(isSubmitting: false);
-    cubits.fade.update(fade: FadeEvent.fadeIn);
   }
 
   Future<void> leavePool() async {
     try {
-      cubits.fade.update(fade: FadeEvent.fadeOut);
-      await Future.delayed(fadeDuration);
-      update(isSubmitting: true);
-      cubits.fade.update(fade: FadeEvent.fadeIn);
+      await _fadeOutAndIn();
 
       var storedDataString =
           await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
@@ -274,12 +297,8 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       String fromAddress = storedData['address'];
       String privateKey = storedData['satori_magic_pool'];
 
-      await prepareToSendBack(
-        fromAddress: fromAddress,
-        privateKey: privateKey,
-        toAddress: toAddress,
-        amount: state.amount,
-      );
+      update(poolAddress: fromAddress);
+      await prepareForSend(isLeavingPool: true, poolWif: privateKey);
 
       update(isSubmitting: false);
       cubits.fade.update(fade: FadeEvent.fadeIn);
@@ -289,30 +308,11 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     }
   }
 
-  Future<void> prepareToSendBack({
-    required String fromAddress,
-    required String privateKey,
-    required String toAddress,
-    required String amount,
-  }) async {
-    SatoriServerClient satori = SatoriServerClient();
-    // Todo:Leave pool logic
-/*    var response = await satori.leavepool(
-      fromAddress,
-      privateKey,
-      toAddress,
-      amount,
-    );
-    if (response.containsKey('ERROR')) {
-      update(isSubmitting: false);
-      return;
-    } else {
-      update(
-        amount: amount,
-        poolAddress: toAddress,
-      );
-      await prepareForSend(isLeavingPool: true, poolWif: privateKey);
-    }*/
+  Future<void> _fadeOutAndIn() async {
+    cubits.fade.update(fade: FadeEvent.fadeOut);
+    await Future.delayed(fadeDuration);
+    update(isSubmitting: true);
+    cubits.fade.update(fade: FadeEvent.fadeIn);
   }
 
   Future<void> setPoolExitTransaction({
@@ -320,24 +320,28 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     required String symbol,
     required String poolWif,
   }) async {
-    final changeAddress =
-        await cubits.receive.populateChangeAddress(blockchain);
-
-    KeypairWallet(wif: poolWif);
+    final changeAddress = cubits.keys.master.derivationWallets.first
+        .seedWallet(blockchain)
+        .externals
+        .lastOrNull
+        ?.address;
+    logD('changeAddress: $changeAddress');
+    logD('poolWif: $poolWif');
+    logD('address: ${state.poolAddress}');
     UnsignedTransactionResultCalled? unsigned = await UnsignedTransactionCall(
       derivationWallets: [],
       keypairWallets: [KeypairWallet(wif: poolWif)],
       symbol: symbol,
-      sats: -1,
-      changeAddress: changeAddress,
-      address: state.poolAddress,
+      sats: state.poolHolding?.sats.value ?? -1,
+      changeAddress: state.poolAddress,
+      address: changeAddress ?? '',
       memo: null,
       blockchain: blockchain,
     ).call();
 
     cubits.send.update(
       unsignedTransaction: unsigned,
-      changeAddress: changeAddress,
+      changeAddress: state.poolAddress,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:magic/domain/server/serverv2_client.dart';
 import 'package:magic/domain/server/wrappers/unsigned_tx_result.dart';
 import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/services/calls/server.dart';
+import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/moontree_utils.dart';
 
 class UnsignedTransactionCall extends ServerCall {
@@ -75,6 +76,7 @@ class UnsignedTransactionCall extends ServerCall {
     );
 
     if (unsigned.length == 1 && unsigned.first.error != null) {
+      logE('error: ${unsigned.first.error}');
       // handle
       return null;
     }

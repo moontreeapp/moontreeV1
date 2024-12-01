@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magic/cubits/canvas/holding/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
@@ -130,13 +131,19 @@ class AnimatedCoinSpec extends StatelessWidget {
               //partStyle: AppText.partHolding,
             )
           else
-            CoinBalanceView(
-              coin: coin ?? cubits.holding.state.holding.coin,
-              //wholeStyle: AppText.wholeHolding,
-              //partOneStyle: AppText.partHolding,
-              //partTwoStyle: AppText.partHolding,
-              //partThreeStyle: AppText.partHolding,
-            )
+            BlocBuilder<PoolCubit, PoolState>(
+                builder: (BuildContext context, PoolState state) {
+              return CoinBalanceView(
+                coin: (cubits.pool.state.poolStatus == PoolStatus.joined &&
+                        cubits.pool.state.isActive)
+                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
+                    : coin ?? cubits.holding.state.holding.coin,
+                //wholeStyle: AppText.wholeHolding,
+                //partOneStyle: AppText.partHolding,
+                //partTwoStyle: AppText.partHolding,
+                //partThreeStyle: AppText.partHolding,
+              );
+            })
         else ...[
           Text(whole, style: AppText.wholeHolding.copyWith(height: 0)),
           if ((part ?? cubits.holding.state.part) != '')

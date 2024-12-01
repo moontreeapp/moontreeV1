@@ -129,6 +129,7 @@ class SendCubit extends UpdatableCubit<SendState> {
 
   Future<bool> signUnsignedTransaction() async {
     if (state.unsignedTransaction == null) {
+      logE('unsignedTransaction is null');
       return false;
     }
     List<Transaction> txs = [];
