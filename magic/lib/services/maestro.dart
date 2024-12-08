@@ -476,8 +476,10 @@ class Maestro {
       title: 'Send',
       clearTitleChild: true,
       onLead: () {
-        cubits.send.reset();
-        activateHistory();
+        if (!locked) {
+          cubits.send.reset();
+          activateHistory();
+        }
       },
       onTitle: cubits.appbar.none,
     );
@@ -509,7 +511,11 @@ class Maestro {
       leading: AppbarLeading.back,
       title: 'Receive',
       clearTitleChild: true,
-      onLead: activateHistory,
+      onLead: () {
+        if (!locked) {
+          activateHistory();
+        }
+      },
       onTitle: cubits.appbar.none,
     );
     cubits.menu.update(active: false);
@@ -557,12 +563,14 @@ class Maestro {
       title: 'Magic Pool',
       clearTitleChild: true,
       onLead: () {
-        if (cubits.pool.state.poolStatus == PoolStatus.addMore) {
-          cubits.pool.update(
-            poolStatus: PoolStatus.joined,
-          );
-        } else {
-          activateHistory();
+        if (!cubits.pool.state.isSubmitting) {
+          if (cubits.pool.state.poolStatus == PoolStatus.addMore) {
+            cubits.pool.update(
+              poolStatus: PoolStatus.joined,
+            );
+          } else {
+            activateHistory();
+          }
         }
       },
       onTitle: cubits.appbar.none,

@@ -151,6 +151,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
               ? [KeypairWallet(wif: privateKey)]
               : cubits.keys.master.keypairWallets,
         ).call());
+    logWTF('poolHolding: $poolHolding');
 
     Holding satoriHolding = poolHolding.firstWhere(
       (element) => element.symbol == 'SATORI',

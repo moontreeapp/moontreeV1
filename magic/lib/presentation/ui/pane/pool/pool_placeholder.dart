@@ -1,3 +1,5 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/theme/text.dart';
 import 'package:flutter/material.dart';
@@ -41,38 +43,70 @@ class _PoolContentPlaceholderState extends State<PoolContentPlaceholder>
   Widget build(BuildContext context) {
     return SizedBox(
       height: screen.pane.midHeight,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Placeholder for Amount TextField
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: _PlaceholderItem(animation: _animation),
-          ),
-          // Placeholder for Join button
-          Padding(
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 24),
-            child: Container(
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.grey[800]!.withOpacity(_animation.value),
-                borderRadius: BorderRadius.circular(30),
+      child: BlocBuilder<PoolCubit, PoolState>(
+          builder: (BuildContext context, PoolState state) {
+        return Column(
+          mainAxisAlignment: state.poolStatus == PoolStatus.notJoined ||
+                  state.poolStatus == PoolStatus.addMore
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.end,
+          children: [
+            state.poolStatus == PoolStatus.notJoined ||
+                    state.poolStatus == PoolStatus.addMore
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 20),
+                    child: _PlaceholderItem(animation: _animation),
+                  )
+                : SizedBox.shrink(),
+            if (state.poolStatus == PoolStatus.joined)
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 0, bottom: 8),
+                child: buildButton(title: 'ADD MORE', animation: _animation),
               ),
-              child: Center(
-                child: Text(
-                  'JOIN POOL',
-                  style: AppText.button1.copyWith(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 0, bottom: 24),
+              child: buildButton(
+                title: state.poolStatus == PoolStatus.notJoined
+                    ? 'JOIN POOL'
+                    : state.poolStatus == PoolStatus.addMore
+                        ? 'ADD TO POOL'
+                        : 'LEAVE POOL',
+                animation: _animation,
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget buildButton({
+    required String title,
+    required Animation<double> animation,
+  }) {
+    return AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) {
+          return Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.grey[800]!.withOpacity(_animation.value),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Center(
+              child: Text(
+                title,
+                style: AppText.button1.copyWith(
+                  fontSize: 16,
+                  color: Colors.grey,
                 ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 }
 

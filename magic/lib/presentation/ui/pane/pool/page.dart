@@ -102,13 +102,15 @@ class PoolContentState extends State<PoolContent> {
                         {
                           cubits.pool.addMoreToPool(
                             amount: amountText.text,
-                          )
+                          ),
+                          amountText.clear(),
                         }
                       else
                         {
                           cubits.pool.joinPool(
                             amount: amountText.text,
                           ),
+                          amountText.clear(),
                         }
                     }
                   : cubits.toast.flash(
@@ -140,7 +142,7 @@ class PoolContentState extends State<PoolContent> {
               amountText.text = fiatAmount.toString();
             });
           } catch (e) {
-            logD(e);
+            logE(e);
           }
         } else {
           amountText.text = cubits.holding.state.holding.coin.entire();
@@ -247,15 +249,15 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            AppButton(
-              onPressed: () {
-                // cubits.pool.addMore();
-                cubits.pool.update(
-                  poolStatus: PoolStatus.addMore,
-                );
-              },
-              label: 'ADD MORE',
-            ),
+            //Todo: Un-hide when server fixed
+            // AppButton(
+            //   onPressed: () {
+            //     cubits.pool.update(
+            //       poolStatus: PoolStatus.addMore,
+            //     );
+            //   },
+            //   label: 'ADD MORE',
+            // ),
             const SizedBox(height: 8),
             AppButton(
               onPressed: () {

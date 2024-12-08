@@ -130,13 +130,26 @@ void showAppDialog({
       return AlertDialog(
         backgroundColor: AppColors.backhalf,
         title: Text(title),
-        content: Text(
-          content,
-          style: const TextStyle(
-            fontSize: 13,
-            color: Colors.white,
-            fontWeight: FontWeight.w400,
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              content,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            // ConfirmationItem(
+            //   label: 'Fee:',
+            //   overrideDisplay: SimpleCoinSplitView(
+            //     mode: DifficultyMode.hard,
+            //     coin: Sats(cubits.send.state.estimate?.extraFees ?? 0).toCoin(),
+            //     incoming: null,
+            //   ),
+            // )
+          ],
         ),
         actions: <Widget>[
           Row(
