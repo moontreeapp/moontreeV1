@@ -111,7 +111,7 @@ class AddressesPageState extends State<AddressesPage> {
                       itemBuilder: (context, int index) {
                         if (index <
                             cubits.keys.master.derivationWallets.length) {
-                          printOutSecrets(); // for testing
+                          //printOutSecrets(); // for testing
                           return DerivativeWalletSecret(index: index);
                         }
                         return KeyPairSecret(
@@ -149,8 +149,8 @@ void printOutSecrets() {
           for (final subwallet in cubits.keys.master.derivationWallets[i]
               .seedWallet(blockchain)
               .subwallets[exposure]!) {
-            logWTF(
-                'Wallet: $i ${cubits.keys.master.derivationWallets[i].roots(blockchain)} (${exposureLabel(exposure)}: ${(subwallet is HDWalletIndexed) ? subwallet.hdIndex : -1})\n${subwallet.address ?? 'unknown'}');
+            //logWTF(
+            //    'Wallet: $i ${cubits.keys.master.derivationWallets[i].roots(blockchain)} (${exposureLabel(exposure)}: ${(subwallet is HDWalletIndexed) ? subwallet.hdIndex : -1})\n${subwallet.address ?? 'unknown'}');
             Container(
                 padding:
                     const EdgeInsets.only(left: 8, right: 8, top: 4, bottom: 4),
