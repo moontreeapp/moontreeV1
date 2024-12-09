@@ -1,11 +1,20 @@
+import 'dart:io';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:wallet_utils/wallet_utils.dart';
 import 'package:magic/cubits/cubit.dart';
+import 'package:magic/domain/blockchain/blockchain.dart';
+import 'package:magic/domain/blockchain/exposure.dart';
 import 'package:magic/domain/blockchain/mnemonic.dart';
+import 'package:magic/domain/storage/secure.dart';
+import 'package:magic/domain/wallet/extended_wallet_base.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
-import 'dart:io'; // Add this import
+import 'package:magic/utils/logger.dart';
+
 
 enum ImportLifecycle {
   entering,
@@ -47,6 +56,7 @@ enum ImportLifecycle {
         ImportLifecycle.validated,
         ImportLifecycle.success
       ].contains(this);
+
   bool get animating => [
         ImportLifecycle.entering,
         ImportLifecycle.exiting,
@@ -97,6 +107,7 @@ class ImportPageState extends State<ImportPage> {
         /// do we need to get all our assets again? yes.
         /// all of them or just this wallet? just do all of them.
         //cubits.wallet.clearAssets();
+        await retrievePoolHolding();
         await cubits.wallet.populateAssets();
 
         if (isValidMnemonic(value)) {
@@ -129,6 +140,34 @@ class ImportPageState extends State<ImportPage> {
       }
     } else if (lifecycle == ImportLifecycle.success) {
       toStage(ImportLifecycle.exiting);
+    }
+  }
+
+  Future<void> retrievePoolHolding() async {
+    try {
+      final privKey = cubits.keys.master.derivationWallets.last
+          .seedWallet(Blockchain.evrmoreMain)
+          .subwallet(
+            hdIndex: 1,
+            exposure: Exposure.external,
+          )
+          .keyPair
+          .toWIF();
+
+      final kpWallet = KPWallet.fromWIF(
+        privKey,
+        Blockchain.evrmoreMain.network,
+      );
+
+      await secureStorage.write(
+        key: SecureStorageKey.satoriMagicPool.key(),
+        value: jsonEncode({
+          "satori_magic_pool": kpWallet.wif,
+          "address": kpWallet.address,
+        }),
+      );
+    } catch (e, st) {
+      logE('$e,$st');
     }
   }
 
