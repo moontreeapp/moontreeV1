@@ -11,19 +11,25 @@ import 'package:magic/utils/logger.dart';
 import 'package:moontree_utils/moontree_utils.dart' show Trigger;
 
 class RateWaiter extends Trigger {
-  final RateGrabber evrGrabber;
-  final RateGrabber rvnGrabber;
+  final Grabber evrGrabber;
+  final Grabber rvnGrabber;
+  final Grabber satoriGrabber;
   // eventually (once swaps matter) we should push this to the device rather than pull every 10 minutes
   static const Duration _rateWait = Duration(minutes: 10);
   Rate? rvnUsdRate;
   Rate? evrUsdRate;
+  Rate? satoriUsdRate;
 
-  RateWaiter({required this.evrGrabber, required this.rvnGrabber});
+  RateWaiter(
+      {required this.evrGrabber,
+      required this.rvnGrabber,
+      required this.satoriGrabber});
 
   void init() {
     void saveRates() {
       _saveRate(evrGrabber);
       _saveRate(rvnGrabber);
+      _saveRate(satoriGrabber);
     }
 
     saveRates();
@@ -33,10 +39,10 @@ class RateWaiter extends Trigger {
     );
   }
 
-  Future<void> _saveRate(RateGrabber rateGrabber) async =>
+  Future<void> _saveRate(Grabber rateGrabber) async =>
       _save(rateGrabber: rateGrabber, rate: await _rate(rateGrabber));
 
-  Future<double?> _getExistingRate(RateGrabber rateGrabber) async {
+  Future<double?> _getExistingRate(Grabber rateGrabber) async {
     Future<double?> fromCache() async => double.tryParse(await storage.read(
             key: StorageKey.rate
                 .key(_toRate(rateGrabber: rateGrabber, rate: 0)!.id)) ??
@@ -47,12 +53,14 @@ class RateWaiter extends Trigger {
         return evrUsdRate?.rate ?? (await fromCache());
       case 'RVN':
         return rvnUsdRate?.rate ?? (await fromCache());
+      case 'SATORI':
+        return satoriUsdRate?.rate ?? (await fromCache());
       default:
         return null;
     }
   }
 
-  Future<double> _rate(RateGrabber rateGrabber) async {
+  Future<double> _rate(Grabber rateGrabber) async {
     try {
       return (await rateGrabber.get()) ??
           await _getExistingRate(rateGrabber) ??
@@ -70,10 +78,13 @@ class RateWaiter extends Trigger {
     if (symbol == 'RVN') {
       return await _rate(rvnGrabber);
     }
+    if (symbol == 'SATORI') {
+      return await _rate(satoriGrabber);
+    }
     return null;
   }
 
-  Rate? _toRate({required RateGrabber rateGrabber, required double rate}) {
+  Rate? _toRate({required Grabber rateGrabber, required double rate}) {
     switch (rateGrabber.symbol) {
       case 'EVR':
         return Rate(
@@ -93,12 +104,21 @@ class RateWaiter extends Trigger {
             blockchain: Blockchain.ravencoinMain,
           ),
         );
+      case 'SATORI':
+        return Rate(
+          rate: rate,
+          quote: currency.Currency.usd,
+          base: Security(
+            symbol: rateGrabber.symbol,
+            blockchain: Blockchain.evrmoreMain,
+          ),
+        );
       default:
         return null;
     }
   }
 
-  void _save({required RateGrabber rateGrabber, required double rate}) {
+  void _save({required Grabber rateGrabber, required double rate}) {
     logD('saving ${rateGrabber.symbol}, rate: $rate');
     switch (rateGrabber.symbol) {
       case 'EVR':
@@ -108,6 +128,10 @@ class RateWaiter extends Trigger {
       case 'RVN':
         rvnUsdRate = _toRate(rateGrabber: rateGrabber, rate: rate);
         cubits.wallet.newRate(rate: rvnUsdRate!);
+        return;
+      case 'SATORI':
+        satoriUsdRate = _toRate(rateGrabber: rateGrabber, rate: rate);
+        cubits.wallet.newRate(rate: satoriUsdRate!);
         return;
       default:
         return;

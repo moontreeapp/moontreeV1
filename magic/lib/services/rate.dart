@@ -6,13 +6,16 @@ import 'package:http/http.dart' as http;
 import 'package:magic/utils/logger.dart';
 import 'package:tuple/tuple.dart';
 import 'package:moontree_utils/moontree_utils.dart';
+import 'package:magic/services/prices.dart';
 
 abstract class Grabber {
+  late final String symbol;
   Future<double?> get();
 }
 
 class RateGrabber implements Grabber {
-  final String symbol;
+  @override
+  late final String symbol;
   final String fiat;
   Map<String, dynamic> pull = {};
 
@@ -102,4 +105,15 @@ class RateGrabber implements Grabber {
     }
     return price;
   }
+}
+
+class ExchangeRateGrabber implements Grabber {
+  @override
+  late final String symbol;
+
+  ExchangeRateGrabber({required this.symbol});
+
+  @override
+  Future<double?> get() async =>
+      await ExchangeFiatValueRepo.getFiatValue('SATORI');
 }
