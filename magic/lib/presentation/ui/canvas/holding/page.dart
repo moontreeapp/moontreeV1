@@ -197,7 +197,8 @@ class AnimatedCoinSpec extends StatelessWidget {
           icon: 'incoming-raw',
           label: 'Receive',
         ),
-        if (cubits.holding.state.holding.asset.name.toLowerCase() == 'satori')
+        // POOL NOT READY
+        if (false && cubits.holding.state.holding.asset.name.toLowerCase() == 'satori')
           assetButton(
             onTap: () => maestro.activatePoolOnHolding(),
             icon: 'pool',

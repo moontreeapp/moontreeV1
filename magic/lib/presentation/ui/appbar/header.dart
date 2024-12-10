@@ -40,7 +40,7 @@ class AppbarHeader extends StatelessWidget {
                 const AppLifecycleReactor(),
                 const AppActivityWatcher(),
                 const ConnectionIndicator(),
-                if (!Platform.isIOS) const Scanner(),
+                //if (!Platform.isIOS) const Scanner(), // CHROME NOT READY
 
                 //GestureDetector(
                 //    //onTap: () => cubits.fade.update(fade: FadeEvent.fadeOut),

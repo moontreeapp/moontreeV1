@@ -111,8 +111,8 @@ class SettingsSubMenu extends StatelessWidget {
             if (cubits.menu.isInDevMode) const FadeInItem(child: WalletsItem()),
             if (cubits.menu.isInDevMode)
               const FadeInItem(child: AddressesItem()),
-            if (cubits.menu.isInDevMode)
-              const FadeInItem(child: PairWithChromeItem()),
+            //if (cubits.menu.isInDevMode)
+            //  const FadeInItem(child: PairWithChromeItem()), // CHROME NOT READY
           ])));
 
   //Text('Some Setting', style: AppText.h1.copyWith(color: Colors.white));
