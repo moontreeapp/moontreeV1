@@ -125,16 +125,19 @@ class WalletCubit extends UpdatableCubit<WalletState> {
     var storedData = jsonDecode(storedDataString ?? '{}');
     String? privateKey = storedData['satori_magic_pool'];
     final holdings = setCorrespondingFlag(_sort(_newRateThese(
-            symbol: 'EVR',
-            rate: await rates.getRateOf('EVR'),
+            symbolRate: {
+              'EVR': await rates.getRateOf('EVR'),
+              'SATORI': await rates.getRateOf('SATORI'),
+            },
             holdings: await HoldingBalancesCall(
               blockchain: Blockchain.evrmoreMain,
               derivationWallets: cubits.keys.master.derivationWallets,
               keypairWallets: cubits.keys.master.keypairWallets,
             ).call()) +
         _newRateThese(
-            symbol: 'RVN',
-            rate: await rates.getRateOf('RVN'),
+            symbolRate: {
+              'RVN': await rates.getRateOf('RVN'),
+            },
             holdings: await HoldingBalancesCall(
               blockchain: Blockchain.ravencoinMain,
               derivationWallets: cubits.keys.master.derivationWallets,
@@ -142,8 +145,7 @@ class WalletCubit extends UpdatableCubit<WalletState> {
             ).call())));
     logWTF('holdings: $holdings');
     final poolHolding = _newRateThese(
-        symbol: 'EVR',
-        rate: await rates.getRateOf('EVR'),
+        symbolRate: {'SATORI': await rates.getRateOf('SATORI')},
         holdings: await HoldingBalancesCall(
           blockchain: Blockchain.evrmoreMain,
           derivationWallets: [],
@@ -235,19 +237,25 @@ class WalletCubit extends UpdatableCubit<WalletState> {
   void newRate({required Rate rate}) {
     if (state.holdings.isEmpty) return;
     final holdings = _newRateThese(
-        symbol: rate.base.symbol, rate: rate.rate, holdings: state.holdings);
+      symbolRate: {rate.base.symbol: rate.rate},
+      holdings: state.holdings,
+    );
     update(holdings: holdings);
     cacheRate(rate, holdings);
   }
 
   /// update all the holding with the new rate
-  List<Holding> _newRateThese(
-      {required String symbol, double? rate, required List<Holding> holdings}) {
-    if (holdings.isEmpty || rate == null || rate <= 0) {
+  List<Holding> _newRateThese({
+    required Map<String, double?> symbolRate,
+    required List<Holding> holdings,
+  }) {
+    if (holdings.isEmpty) {
       return holdings;
     }
     return holdings
-        .map((e) => e.symbol == symbol ? e.copyWith(rate: rate) : e)
+        .map((e) => symbolRate[e.symbol] != null
+            ? e.copyWith(rate: symbolRate[e.symbol])
+            : e)
         .toList();
   }
 

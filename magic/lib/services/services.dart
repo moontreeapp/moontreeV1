@@ -42,7 +42,8 @@ void init({
   //server = ServerCall();
   rates = RateWaiter(
       evrGrabber: RateGrabber(symbol: 'EVR'),
-      rvnGrabber: RateGrabber(symbol: 'RVN'))
+      rvnGrabber: RateGrabber(symbol: 'RVN'),
+      satoriGrabber: ExchangeRateGrabber(symbol: 'SATORI'))
     ..init();
   websocket = WebSocketConnection();
   initialized = true;
