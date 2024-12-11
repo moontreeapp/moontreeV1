@@ -34,7 +34,7 @@ class SecurityService {
   Future<bool> authenticateUser({bool? canCheckBio, bool? isAuthSetup}) async {
     canCheckBio = canCheckBio ?? await canCheckBiometrics();
     isAuthSetup = isAuthSetup ?? await isAuthenticationPresent();
-
+    print('canCheckBio: $canCheckBio, isAuthSetup: $isAuthSetup');
     if (Platform.isAndroid && (!canCheckBio || !isAuthSetup)) {
       // Device doesn't support biometrics or auth is not set up
       return true;
