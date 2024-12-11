@@ -41,6 +41,9 @@ class SecurityService {
     } else if (Platform.isIOS && (!canCheckBio && !isAuthSetup)) {
       // Device doesn't support biometrics or auth is not set up
       return true;
+    } else if (Platform.isIOS && !isAuthSetup) {
+      // Device Device doesn't have biometrics or auth set up
+      return true;
     }
 
     try {
