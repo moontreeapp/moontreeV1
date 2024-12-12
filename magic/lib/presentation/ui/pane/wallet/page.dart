@@ -368,50 +368,55 @@ class SimpleIdenticon extends StatelessWidget {
                 ),
               ),
             ),
-          if (blockchain != null &&
-              (showPoolIndicatorIcon &&
-                      cubits.pool.state.poolStatus == PoolStatus.joined ||
-                  !showPoolIndicatorIcon))
-            Positioned(
-              left: 0,
-              bottom: 0,
-              child: Container(
-                width: showPoolIndicatorIcon
-                    ? screen.iconMedium
-                    : screen.iconSmall,
-                height: showPoolIndicatorIcon
-                    ? screen.iconMedium
-                    : screen.iconSmall,
-                // TODO: implement chain icons for assets with the same name on different chains
-                // TODO: This code works but it get's applied to all assets currently.
-                // width: blockchainIconSizeValue,
-                // height: blockchainIconSizeValue,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: showPoolIndicatorIcon //||showBlockchainIcon
-                      ? AppColors.buttonLight
-                      : AppColors.background,
+          BlocBuilder<PoolCubit, PoolState>(
+              builder: (BuildContext context, PoolState state) {
+            if (blockchain != null &&
+                (showPoolIndicatorIcon &&
+                        state.poolStatus == PoolStatus.joined ||
+                    !showPoolIndicatorIcon)) {
+              return Positioned(
+                left: 0,
+                bottom: 0,
+                child: Container(
+                  width: showPoolIndicatorIcon
+                      ? screen.iconMedium
+                      : screen.iconMedium,
+                  height: showPoolIndicatorIcon
+                      ? screen.iconMedium
+                      : screen.iconMedium,
+                  // TODO: implement chain icons for assets with the same name on different chains
+                  // TODO: This code works but it get's applied to all assets currently.
+                  // width: blockchainIconSizeValue,
+                  // height: blockchainIconSizeValue,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: showPoolIndicatorIcon //||showBlockchainIcon
+                        ? AppColors.buttonLight
+                        : AppColors.background,
+                  ),
+                  child: showPoolIndicatorIcon
+                      ? SvgPicture.asset(
+                          '${TransactionIcons.base}/pool.${TransactionIcons.ext}',
+                          height: screen.iconMedium - 10,
+                          width: screen.iconMedium - 10,
+                        )
+                      : Image.asset(
+                          showAppIcon
+                              ? iconPath ?? blockchain!.logo
+                              : blockchain!.logo,
+                          width: screen.iconMedium,
+                          height: screen.iconMedium,
+                          // TODO: implement chain icons for assets with the same name on different chains
+                          // TODO: This code works but it get's applied to all assets currently.
+                          // width: blockchainIconSizeValue,
+                          // height: blockchainIconSizeValue,
+                        ),
                 ),
-                child: showPoolIndicatorIcon
-                    ? SvgPicture.asset(
-                        '${TransactionIcons.base}/pool.${TransactionIcons.ext}',
-                        height: screen.iconMedium - 10,
-                        width: screen.iconMedium - 10,
-                      )
-                    : Image.asset(
-                        showAppIcon
-                            ? iconPath ?? blockchain!.logo
-                            : blockchain!.logo,
-                        width: screen.iconSmall,
-                        height: screen.iconSmall,
-                        // TODO: implement chain icons for assets with the same name on different chains
-                        // TODO: This code works but it get's applied to all assets currently.
-                        // width: blockchainIconSizeValue,
-                        // height: blockchainIconSizeValue,
-                      ),
-              ),
-            ),
+              );
+            }
+            return SizedBox.shrink();
+          }),
         ],
       );
     }

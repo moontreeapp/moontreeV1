@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:magic/domain/storage/secure.dart';
+import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/ui/pane/pool/pool_placeholder.dart';
+import 'package:magic/presentation/ui/pane/wallet/page.dart';
 import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/presentation/widgets/other/app_dialog.dart';
 import 'package:magic/presentation/ui/pane/send/page.dart';
@@ -59,6 +64,13 @@ class PoolContentState extends State<PoolContent> {
   bool amountDollars = false;
   bool automaticConversion = false;
   bool userChanged = false;
+  String? secureStorageAddress;
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveSecureStorageAddress();
+  }
 
   @override
   void dispose() {
@@ -67,6 +79,9 @@ class PoolContentState extends State<PoolContent> {
   }
 
   bool validateVisibleForm() => cubits.send.validateAmount(amountText.text);
+
+  bool validateBalance() =>
+      (double.tryParse(cubits.holding.state.holding.coin.entire()) ?? 0) > 0;
 
   String formatWithCommas(String value) {
     if (value.isEmpty) return value;
@@ -80,23 +95,29 @@ class PoolContentState extends State<PoolContent> {
   Widget build(BuildContext context) => Container(
         height: screen.pane.midHeight,
         padding:
-            const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 24),
+            const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 24),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment:
+              (secureStorageAddress != null && secureStorageAddress!.isNotEmpty)
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
           children: [
-            BlocBuilder<PoolCubit, PoolState>(
-              builder: (BuildContext context, PoolState state) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    amountTextField(),
-                  ],
-                );
-              },
-            ),
+            // BlocBuilder<PoolCubit, PoolState>(
+            //   builder: (BuildContext context, PoolState state) {
+            //     return Column(
+            //       mainAxisAlignment: MainAxisAlignment.start,
+            //       children: [
+            //         const SizedBox(height: 8),
+            //         amountTextField(),
+            //       ],
+            //     );
+            //   },
+            // ),
+            if (secureStorageAddress != null &&
+                secureStorageAddress!.isNotEmpty)
+              PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
-              onPressed: () => validateVisibleForm()
+              onPressed: () => validateBalance()
                   ? {
                       if (widget.addMore)
                         {
@@ -108,15 +129,21 @@ class PoolContentState extends State<PoolContent> {
                       else
                         {
                           cubits.pool.joinPool(
-                            amount: amountText.text,
+                            amount: cubits.holding.state.holding.coin.entire(),
                           ),
                           amountText.clear(),
                         }
                     }
-                  : cubits.toast.flash(
+                  : /*cubits.toast.flash(
                       msg: const ToastMessage(
                         title: 'Unable to Continue:',
                         text: 'Invalid form',
+                      ),
+                    )*/
+                  cubits.toast.flash(
+                      msg: const ToastMessage(
+                        title: '',
+                        text: 'No balance in selected asset',
                       ),
                     ),
               label: widget.addMore ? 'ADD TO POOL' : 'JOIN POOL',
@@ -227,6 +254,23 @@ class PoolContentState extends State<PoolContent> {
       ),
     );
   }
+
+  Future<void> _retrieveSecureStorageAddress() async {
+    var storedDataString =
+        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
+    var storedData = jsonDecode(storedDataString ?? '{}');
+
+    if (storedData == null ||
+        !storedData.containsKey('address') ||
+        !storedData.containsKey('satori_magic_pool')) {
+      logW('Stored data is incomplete or missing');
+      return;
+    }
+
+    setState(() {
+      secureStorageAddress = storedData['address'];
+    });
+  }
 }
 
 class JoinedPoolContent extends StatefulWidget {
@@ -237,17 +281,28 @@ class JoinedPoolContent extends StatefulWidget {
 }
 
 class JoinedPoolContentState extends State<JoinedPoolContent> {
+  String? secureStorageAddress;
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveSecureStorageAddress();
+  }
+
   @override
   Widget build(BuildContext context) => Container(
         height: screen.pane.midHeight,
         padding: const EdgeInsets.only(
           left: 16,
           right: 16,
-          top: 12,
+          top: 24,
           bottom: 24,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment:
+              (secureStorageAddress != null && secureStorageAddress!.isNotEmpty)
+                  ? MainAxisAlignment.spaceBetween
+                  : MainAxisAlignment.end,
           children: [
             //Todo: Un-hide when server fixed
             // AppButton(
@@ -258,7 +313,10 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
             //   },
             //   label: 'ADD MORE',
             // ),
-            const SizedBox(height: 8),
+            // const SizedBox(height: 8),
+            if (secureStorageAddress != null &&
+                secureStorageAddress!.isNotEmpty)
+              PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
               onPressed: () {
                 showAppDialog(
@@ -276,4 +334,92 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
           ],
         ),
       );
+
+  Future<void> _retrieveSecureStorageAddress() async {
+    var storedDataString =
+        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
+    var storedData = jsonDecode(storedDataString ?? '{}');
+
+    if (storedData == null ||
+        !storedData.containsKey('address') ||
+        !storedData.containsKey('satori_magic_pool')) {
+      logE('Stored data is incomplete or missing');
+      return;
+    }
+
+    setState(() {
+      secureStorageAddress = storedData['address'];
+    });
+  }
+}
+
+class PoolAddress extends StatelessWidget {
+  final String secureStorageAddress;
+  const PoolAddress({super.key, required this.secureStorageAddress});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 64,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: AppColors.black.withOpacity(.16),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CurrencyIdenticon(
+            holding: cubits.holding.state.holding,
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: 1,
+                itemBuilder: (context, index) => FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: SelectableText.rich(
+                        TextSpan(
+                          text: '',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall!
+                              .copyWith(
+                                  color: AppColors.white.withOpacity(.44)),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: secureStorageAddress.substring(0, 6),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: secureStorageAddress.substring(
+                                  6, secureStorageAddress.length - 6),
+                            ),
+                            TextSpan(
+                              text: secureStorageAddress
+                                  .substring(secureStorageAddress.length - 6),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+          ),
+          IconButton(
+            style: IconButton.styleFrom(),
+            icon: const Icon(Icons.copy),
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: secureStorageAddress));
+            },
+          )
+        ],
+      ),
+    );
+  }
 }

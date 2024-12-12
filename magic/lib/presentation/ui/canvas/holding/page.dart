@@ -124,19 +124,23 @@ class AnimatedCoinSpec extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         if (whole == null)
           if ((coin?.coin ?? cubits.holding.state.holding.coin.coin) > 0)
-            CoinBalancePriceSimpleView(
-              coin: coin ?? cubits.holding.state.holding.coin,
-              alt: dollarText,
-              //wholeStyle: AppText.wholeHolding,
-              //partStyle: AppText.partHolding,
-            )
+            BlocBuilder<PoolCubit, PoolState>(
+                builder: (BuildContext context, PoolState state) {
+              return CoinBalancePriceSimpleView(
+                coin: state.active
+                    ? state.poolHolding?.coin ?? Coin()
+                    : coin ?? cubits.holding.state.holding.coin,
+                alt: dollarText,
+                //wholeStyle: AppText.wholeHolding,
+                //partStyle: AppText.partHolding,
+              );
+            })
           else
             BlocBuilder<PoolCubit, PoolState>(
                 builder: (BuildContext context, PoolState state) {
               return CoinBalanceView(
-                coin: (cubits.pool.state.poolStatus == PoolStatus.joined &&
-                        cubits.pool.state.isActive)
-                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
+                coin: state.active
+                    ? state.poolHolding?.coin ?? Coin()
                     : coin ?? cubits.holding.state.holding.coin,
                 //wholeStyle: AppText.wholeHolding,
                 //partOneStyle: AppText.partHolding,

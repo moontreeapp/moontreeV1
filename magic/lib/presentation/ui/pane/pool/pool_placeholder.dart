@@ -48,32 +48,32 @@ class _PoolContentPlaceholderState extends State<PoolContentPlaceholder>
         return Column(
           mainAxisAlignment: state.poolStatus == PoolStatus.notJoined ||
                   state.poolStatus == PoolStatus.addMore
-              ? MainAxisAlignment.spaceBetween
+              ? MainAxisAlignment.end
               : MainAxisAlignment.end,
           children: [
-            state.poolStatus == PoolStatus.notJoined ||
-                    state.poolStatus == PoolStatus.addMore
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 20),
-                    child: _PlaceholderItem(animation: _animation),
-                  )
-                : SizedBox.shrink(),
-            if (state.poolStatus == PoolStatus.joined)
-              Padding(
-                padding: const EdgeInsets.only(
-                    left: 16, right: 16, top: 0, bottom: 8),
-                child: buildButton(title: 'ADD MORE', animation: _animation),
-              ),
+            // state.poolStatus == PoolStatus.notJoined ||
+            //         state.poolStatus == PoolStatus.addMore
+            //     ? Padding(
+            //         padding: const EdgeInsets.symmetric(
+            //             horizontal: 16, vertical: 20),
+            //         child: _PlaceholderItem(animation: _animation),
+            //       )
+            //     : SizedBox.shrink(),
+            // if (state.poolStatus == PoolStatus.joined)
+            //   Padding(
+            //     padding: const EdgeInsets.only(
+            //         left: 16, right: 16, top: 0, bottom: 8),
+            //     child: buildButton(title: 'ADD MORE', animation: _animation),
+            //   ),
             Padding(
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 0, bottom: 24),
               child: buildButton(
                 title: state.poolStatus == PoolStatus.notJoined
-                    ? 'JOIN POOL'
+                    ? 'JOINING POOL...'
                     : state.poolStatus == PoolStatus.addMore
                         ? 'ADD TO POOL'
-                        : 'LEAVE POOL',
+                        : 'LEAVING POOL...',
                 animation: _animation,
               ),
             ),
