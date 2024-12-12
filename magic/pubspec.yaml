@@ -61,7 +61,7 @@ dependencies:
   collection: ^1.18.0
   http: ^1.2.1
   tuple: ^2.0.2
-  local_auth: ^2.2.0
+  local_auth: ^2.3.0
   crypto: ^3.0.6
   mobile_scanner: ^6.0.0
 
