@@ -48,3 +48,7 @@ releases/*
 
 # lock files
 *pubspec.lock
+ios/Podfile.lock
+*/pubspec.lock
+*/ios/Runner/*
+*/ios/Runner.xcodeproj/*
