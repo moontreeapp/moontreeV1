@@ -90,66 +90,46 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       String? nextAddress;
       String wif;
 
-      var storedDataString =
-          await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
-      var storedData = jsonDecode(storedDataString ?? '{}');
+      final lastIndex = await _getLastIndex(
+        blockchain: Blockchain.evrmoreMain,
+        exposure: Exposure.external,
+      );
 
-      if (storedData == null ||
-          !storedData.containsKey('address') ||
-          !storedData.containsKey('satori_magic_pool')) {
-        final lastIndex = await _getLastIndex(
-          blockchain: Blockchain.evrmoreMain,
-          exposure: Exposure.external,
-        );
+      final privateKey = cubits.keys.master.derivationWallets.last
+          .seedWallet(Blockchain.evrmoreMain)
+          .subwallet(
+            hdIndex: lastIndex,
+            exposure: Exposure.external,
+          )
+          .keyPair
+          .toWIF();
 
-        final privateKey = cubits.keys.master.derivationWallets.last
-            .seedWallet(Blockchain.evrmoreMain)
-            .subwallet(
-              hdIndex: lastIndex,
-              exposure: Exposure.external,
-            )
-            .keyPair
-            .toWIF();
+      KPWallet kpWallet = KPWallet.fromWIF(
+        privateKey,
+        Blockchain.evrmoreMain.network,
+      );
 
-        KPWallet kpWallet = KPWallet.fromWIF(
-          privateKey,
-          Blockchain.evrmoreMain.network,
-        );
+      wif = kpWallet.wif!;
+      nextAddress = kpWallet.address;
 
-        wif = kpWallet.wif!;
-        nextAddress = kpWallet.address;
+      SatoriServerClient satori = SatoriServerClient();
 
-        SatoriServerClient satori = SatoriServerClient();
+      var response = await satori.registerWallet(
+        kpWallet: kpWallet,
+      );
 
-        var response = await satori.registerWallet(
-          kpWallet: kpWallet,
-        );
-
-        if (response == false) {
-          update(isSubmitting: false);
-          return;
-        }
-
-        var satoriMagicPoolString = await secureStorage.read(
-            key: SecureStorageKey.satoriMagicPool.key());
-        var satoriMagicPool =
-            satoriMagicPoolString != null && satoriMagicPoolString.isNotEmpty
-                ? jsonDecode(satoriMagicPoolString)
-                : null;
-        if (satoriMagicPool == null ||
-            satoriMagicPool['satori_magic_pool'] == null) {
-          await secureStorage.write(
-            key: SecureStorageKey.satoriMagicPool.key(),
-            value: jsonEncode({
-              "satori_magic_pool": kpWallet.wif,
-              "address": nextAddress,
-            }),
-          );
-        }
-      } else {
-        nextAddress = storedData['address'];
-        wif = storedData['satori_magic_pool'];
+      if (response == false) {
+        update(isSubmitting: false);
+        return;
       }
+      await secureStorage.write(
+        key: SecureStorageKey.satoriMagicPool.key(),
+        value: jsonEncode({
+          "satori_magic_pool": kpWallet.wif,
+          "address": nextAddress,
+        }),
+      );
+
       update(
         amount: amount,
         poolAddress: nextAddress,
