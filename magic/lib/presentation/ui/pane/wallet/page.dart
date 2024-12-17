@@ -558,7 +558,7 @@ class _HoldingItemPlaceholderState extends State<HoldingItemPlaceholder>
             height: screen.iconLarge,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.frontItem.withOpacity(_animation.value),
+              color: AppColors.frontItem.withValues(alpha: _animation.value),
             ),
           ),
           title: SizedBox(
@@ -572,7 +572,7 @@ class _HoldingItemPlaceholderState extends State<HoldingItemPlaceholder>
               width: double.infinity,
               height: 24,
               decoration: BoxDecoration(
-                color: AppColors.frontItem.withOpacity(_animation.value),
+                color: AppColors.frontItem.withValues(alpha: _animation.value),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

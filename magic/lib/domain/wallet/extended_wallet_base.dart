@@ -5,6 +5,8 @@ import 'package:convert/convert.dart' show hex;
 import 'package:magic/domain/wallet/sign/sign_message.dart';
 import 'package:wallet_utils/wallet_utils.dart' show WalletBase, ECPair;
 import 'package:wallet_utils/wallet_utils.dart' as wu;
+import 'package:flutter/foundation.dart';
+import 'package:magic/utils/logger.dart';
 
 extension ExtendedWalletBase on WalletBase {
   Uint8List get outputScript {
@@ -23,6 +25,9 @@ extension ExtendedWalletBase on WalletBase {
 
   /// Signs a message with the private key of the wallet.
   String signCompact(String message) {
+    if (kDebugMode) {
+      logW('address: $address');
+    }
     return SignMessage(
       message: message,
       prefix: network.messagePrefix,

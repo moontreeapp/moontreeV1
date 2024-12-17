@@ -225,7 +225,7 @@ enum Blockchain {
     }
     if (chain == Chain.evrmore) {
       if (net == Net.main) {
-        return address.isAddressEVR || (address.startsWith('e') && address.length == 34); // allow p2sh
+        return address.isAddressEVR || (address.startsWith('e') && address.length == 34);  // allow p2sh
       } else if (net == Net.test) {
         return address.isAddressEVRt;
       }

@@ -71,7 +71,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     ));
   }
 
-  Future<int> _getLastIndex({
+  Future<int> getLastIndex({
     required Blockchain blockchain,
     required Exposure exposure,
   }) async {
@@ -90,7 +90,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       String? nextAddress;
       String wif;
 
-      final lastIndex = await _getLastIndex(
+      final lastIndex = await getLastIndex(
         blockchain: Blockchain.evrmoreMain,
         exposure: Exposure.external,
       );

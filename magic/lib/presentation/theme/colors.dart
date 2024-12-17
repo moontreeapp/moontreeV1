@@ -16,7 +16,7 @@ class AppColors {
   static const Color toast = Color(0xFF424242);
 
   //static const Color successDark =
-  //    Color(0xFF34C759); //success.withOpacity(.67);
+  //    Color(0xFF34C759); //success.withValues(alpha:.67);
 
   static const Color title = Colors.white;
   static const Color subtitle = Colors.white60;
@@ -145,13 +145,13 @@ class AppColors {
     static const List<int> blackNumbers = <int>[12, 38, 60, 87, 100];
 
     static const Color androidSystemBar =
-    Colors.black; // (0xFF3F7442); //primary.withOpacity(1 - .12);
+    Colors.black; // (0xFF3F7442); //primary.withValues(alpha:1 - .12);
     static const Color androidNavigationBar =
-    Colors.black; //(0xFF3F7442); //primary.withOpacity(1 - .60);
-    //Color(0xFF384277); //primary.withOpacity(1 - .38);
-    //static Color scrim = black.withOpacity(1 - .38);
+    Colors.black; //(0xFF3F7442); //primary.withValues(alpha:1 - .60);
+    //Color(0xFF384277); //primary.withValues(alpha:1 - .38);
+    //static Color scrim = black.withValues(alpha:1 - .38);
     static const Color scrim = black24;
-    static Color scrimLight = white.withOpacity(1 - .12);
+    static Color scrimLight = white.withValues(alpha:1 - .12);
 
     static List<int> tooClose(int index) =>
     <int, List<int>>{

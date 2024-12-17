@@ -127,7 +127,7 @@ class TransactionItem extends StatelessWidget {
                 style: Theme.of(context).textTheme.body1.copyWith(
                       height: 0,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.white.withOpacity(.67),
+                      color: AppColors.white.withValues(alpha: .67),
                     ))
             : SimpleCoinSplitView(
                 mode: DifficultyMode.hard,
@@ -232,14 +232,14 @@ class _TransactionItemPlaceholderState extends State<TransactionItemPlaceholder>
             height: screen.iconHuge,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.frontItem.withOpacity(_animation.value),
+              color: AppColors.frontItem.withValues(alpha: _animation.value),
             ),
           ),
           title: Container(
             width: double.infinity,
             height: 24,
             decoration: BoxDecoration(
-              color: AppColors.frontItem.withOpacity(_animation.value),
+              color: AppColors.frontItem.withValues(alpha: _animation.value),
               borderRadius: BorderRadius.circular(12),
             ),
           ),

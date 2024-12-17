@@ -71,6 +71,9 @@ class SignMessage {
       final result = Uint8List.fromList([...metaBytes, ...signature]);
 
       String signatureStr = base64Encode(result);
+      if (kDebugMode) {
+        logW('signatureStr: $signatureStr');
+      }
 
       return signatureStr;
     }

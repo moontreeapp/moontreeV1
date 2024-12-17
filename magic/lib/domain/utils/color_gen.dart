@@ -16,11 +16,11 @@ MaterialColor generateMaterialColor(Color color) {
   });
 }
 
-int tintValue(int value, double factor) =>
+int tintValue(double value, double factor) =>
     max(0, min((value + ((255 - value) * factor)).round(), 255));
 
 Color tintColor(Color color, double factor) => Color.fromRGBO(
-    tintValue(color.red, factor),
-    tintValue(color.green, factor),
-    tintValue(color.blue, factor),
+    tintValue(color.r, factor),
+    tintValue(color.g, factor),
+    tintValue(color.b, factor),
     1);

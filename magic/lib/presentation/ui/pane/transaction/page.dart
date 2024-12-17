@@ -118,7 +118,7 @@ class TransactionPage extends StatelessWidget {
               //  color: Colors.transparent,
               //  child: InkWell(
               //    borderRadius: BorderRadius.circular(28 * 100),
-              //    splashColor: AppColors.background.withOpacity(0.2),
+              //    splashColor: AppColors.background.withValues(alpha:0.2),
               //    onTap: () => launchUrl(Uri.parse(
               //        display.blockchain?.explorerTxUrl(display.hash) ?? '')),
               //    child: Container(

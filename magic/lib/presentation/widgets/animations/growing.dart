@@ -51,7 +51,7 @@ class GrowingCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ColorFiltered(
         colorFilter: ColorFilter.mode(
-          Colors.white.withOpacity(1.0),
+          Colors.white.withValues(alpha: 1.0),
           BlendMode.srcOut,
         ),
         child: Stack(

@@ -16,10 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:magic/utils/logger.dart';
 
-// hdwallet = cubits.keys.master.derivationWallets.last.seedWallet(Blockchain.evrmore).externals.last;
-// save to secure storage with key satoriMagicPool and value hdwallet.privkey
-//SatoriServerClient().registerWallet(hdWallet: )
-
 class PoolPage extends StatelessWidget {
   const PoolPage({super.key});
 
@@ -363,7 +359,7 @@ class PoolAddress extends StatelessWidget {
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppColors.black.withOpacity(.16),
+        color: AppColors.black.withValues(alpha: .16),
         borderRadius: BorderRadius.circular(30),
       ),
       child: Row(
@@ -389,7 +385,7 @@ class PoolAddress extends StatelessWidget {
                               .textTheme
                               .bodySmall!
                               .copyWith(
-                                  color: AppColors.white.withOpacity(.44)),
+                                  color: AppColors.white.withValues(alpha:.44)),
                           children: <TextSpan>[
                             TextSpan(
                               text: secureStorageAddress.substring(0, 6),

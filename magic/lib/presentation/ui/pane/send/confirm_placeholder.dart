@@ -61,7 +61,7 @@ class _ConfirmContentPlaceholderState extends State<ConfirmContentPlaceholder>
                           height: 24,
                           decoration: BoxDecoration(
                             color: AppColors.frontItem
-                                .withOpacity(_animation.value),
+                                .withValues(alpha: _animation.value),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -72,7 +72,7 @@ class _ConfirmContentPlaceholderState extends State<ConfirmContentPlaceholder>
                             height: 24,
                             decoration: BoxDecoration(
                               color: AppColors.frontItem
-                                  .withOpacity(_animation.value),
+                                  .withValues(alpha: _animation.value),
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
@@ -103,7 +103,8 @@ class _ConfirmContentPlaceholderState extends State<ConfirmContentPlaceholder>
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.grey[800]!.withOpacity(_animation.value),
+                    color:
+                        Colors.grey[800]!.withValues(alpha: _animation.value),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: Center(
@@ -136,7 +137,7 @@ class _PlaceholderItem extends StatelessWidget {
       width: double.infinity,
       height: 24,
       decoration: BoxDecoration(
-        color: AppColors.frontItem.withOpacity(animation.value),
+        color: AppColors.frontItem.withValues(alpha: animation.value),
         borderRadius: BorderRadius.circular(12),
       ),
     );

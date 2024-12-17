@@ -93,7 +93,7 @@ class _PoolContentPlaceholderState extends State<PoolContentPlaceholder>
           return Container(
             height: 64,
             decoration: BoxDecoration(
-              color: Colors.grey[800]!.withOpacity(_animation.value),
+              color: Colors.grey[800]!.withValues(alpha: _animation.value),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Center(
@@ -125,7 +125,7 @@ class _PlaceholderItem extends StatelessWidget {
           height: 64,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: AppColors.frontItem.withOpacity(animation.value),
+            color: AppColors.frontItem.withValues(alpha: animation.value),
             borderRadius: BorderRadius.circular(28 * 100),
           ),
           child: Align(

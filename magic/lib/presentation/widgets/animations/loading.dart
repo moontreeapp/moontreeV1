@@ -26,8 +26,8 @@ class LoadingIndicator extends StatelessWidget {
                       double.infinity, // Ensure the Container fills the width
                   height: screen
                       .pane.midHeight, // Match the height to your container
-                  color: Colors.black.withOpacity(
-                      0), // Transparent color to apply the blur only
+                  color: Colors.black.withValues(
+                      alpha: 0), // Transparent color to apply the blur only
                 ),
               ),
             ),

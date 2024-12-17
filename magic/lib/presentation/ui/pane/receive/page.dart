@@ -87,7 +87,7 @@ class ReceivePage extends StatelessWidget {
                                 .textTheme
                                 .bodySmall!
                                 .copyWith(
-                                    color: AppColors.white.withOpacity(.44)),
+                                    color: AppColors.white.withValues(alpha:.44)),
                             children: <TextSpan>[
                               TextSpan(
                                 text: cubits.receive.state.address

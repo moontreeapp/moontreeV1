@@ -41,7 +41,7 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(28 * 100),
           ),
           shadowColor: Colors.transparent,
-          overlayColor: AppColors.white.withOpacity(0.12),
+          overlayColor: AppColors.white.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 10),
         ),
         onPressed: isDisabled ? null : onPressed,

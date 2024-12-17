@@ -15,7 +15,6 @@ import 'package:magic/presentation/widgets/other/app_button.dart';
 import 'package:magic/services/services.dart';
 import 'package:magic/utils/logger.dart';
 
-
 enum ImportLifecycle {
   entering,
   form,
@@ -145,17 +144,22 @@ class ImportPageState extends State<ImportPage> {
 
   Future<void> retrievePoolHolding() async {
     try {
-      final privKey = cubits.keys.master.derivationWallets.last
+      final lastIndex = await cubits.pool.getLastIndex(
+        blockchain: Blockchain.evrmoreMain,
+        exposure: Exposure.external,
+      );
+
+      final privateKey = cubits.keys.master.derivationWallets.last
           .seedWallet(Blockchain.evrmoreMain)
           .subwallet(
-            hdIndex: 1,
+            hdIndex: lastIndex,
             exposure: Exposure.external,
           )
           .keyPair
           .toWIF();
 
-      final kpWallet = KPWallet.fromWIF(
-        privKey,
+      KPWallet kpWallet = KPWallet.fromWIF(
+        privateKey,
         Blockchain.evrmoreMain.network,
       );
 

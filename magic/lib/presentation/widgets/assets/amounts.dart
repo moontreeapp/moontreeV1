@@ -359,7 +359,7 @@ class SimpleCoinSplitView extends StatelessWidget {
                           style: Theme.of(context).textTheme.body1.copyWith(
                               height: 0,
                               fontWeight: FontWeight.w700,
-                              color: AppColors.white87 //.withOpacity(.67),
+                              color: AppColors.white87 //.withValues(alpha:.67),
                               )),
                     TextSpan(
                         text: coin.whole(),
