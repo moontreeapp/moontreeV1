@@ -5,8 +5,8 @@ import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../utils/logger.dart';
-
+import 'package:flutter/foundation.dart';
+import 'package:magic/utils/logger.dart';
 class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
@@ -35,7 +35,7 @@ class SatoriServerClient {
       };
 
       Map<String, String> headers = kpWallet.authPayload();
-
+      logW('body: $body');
       final http.Response response = await http.post(
         Uri.parse('$url/register/wallet'),
         headers: headers,

@@ -34,8 +34,6 @@ class PoolPage extends StatelessWidget {
                 return const PoolContent(
                   addMore: true,
                 );
-              default:
-                return const PoolContent();
             }
           }
         },
@@ -385,7 +383,8 @@ class PoolAddress extends StatelessWidget {
                               .textTheme
                               .bodySmall!
                               .copyWith(
-                                  color: AppColors.white.withValues(alpha:.44)),
+                                  color:
+                                      AppColors.white.withValues(alpha: .44)),
                           children: <TextSpan>[
                             TextSpan(
                               text: secureStorageAddress.substring(0, 6),

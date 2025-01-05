@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magic/cubits/canvas/holding/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
-import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
@@ -18,6 +17,7 @@ import 'package:magic/services/services.dart' show maestro, screen;
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
 import 'package:magic/domain/concepts/asset_icons.dart';
+import 'package:magic/utils/logger.dart';
 
 Holding getHoldingOf(Blockchain blockchain) => cubits.wallet.state.holdings
     .where((x) => x.blockchain == blockchain && x.isCurrency)
@@ -124,11 +124,11 @@ class AnimatedCoinSpec extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         if (whole == null)
           if ((coin?.coin ?? cubits.holding.state.holding.coin.coin) > 0)
-            BlocBuilder<PoolCubit, PoolState>(
-                builder: (BuildContext context, PoolState state) {
+            BlocBuilder<HoldingCubit, HoldingState>(
+                builder: (BuildContext context, HoldingState state) {
               return CoinBalancePriceSimpleView(
-                coin: state.active
-                    ? state.poolHolding?.coin ?? Coin()
+                coin: state.section == HoldingSection.pool
+                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
                     : coin ?? cubits.holding.state.holding.coin,
                 alt: dollarText,
                 //wholeStyle: AppText.wholeHolding,
@@ -136,11 +136,11 @@ class AnimatedCoinSpec extends StatelessWidget {
               );
             })
           else
-            BlocBuilder<PoolCubit, PoolState>(
-                builder: (BuildContext context, PoolState state) {
+            BlocBuilder<HoldingCubit, HoldingState>(
+                builder: (BuildContext context, HoldingState state) {
               return CoinBalanceView(
-                coin: state.active
-                    ? state.poolHolding?.coin ?? Coin()
+                coin: state.section == HoldingSection.pool
+                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
                     : coin ?? cubits.holding.state.holding.coin,
                 //wholeStyle: AppText.wholeHolding,
                 //partOneStyle: AppText.partHolding,
@@ -174,26 +174,24 @@ class AnimatedCoinSpec extends StatelessWidget {
       width: screen.width * .8,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         const SizedBox.shrink(),
-        if (cubits.holding.state.holding.sats.value > 0 &&
-            (cubits.holding.state.holding.isCurrency ||
-                getHoldingOf(cubits.holding.state.holding.blockchain)
-                        .sats
-                        .value >
-                    0))
-          assetButton(
-            onTap: //!['\$ -', '\$ 0.00'].contains(cubits.holding.state.usd)
-                cubits.holding.state.holding.sats.value > 0
-                    ? () => maestro.activateSend()
-                    : () => cubits.toast.flash(
-                          msg: const ToastMessage(
-                            duration: Duration(seconds: 2),
-                            title: 'Empty',
-                            text: 'unable to send',
-                          ),
-                        ),
+
+        AnimatedOpacity(
+          duration: fadeDuration,
+          opacity: cubits.holding.state.holding.sats.value > 0 &&
+                  (cubits.holding.state.holding.isCurrency ||
+                      getHoldingOf(cubits.holding.state.holding.blockchain)
+                              .sats
+                              .value >
+                          0)
+              ? 1
+              : .38,
+          child: assetButton(
+            //!['\$ -', '\$ 0.00'].contains(cubits.holding.state.usd)
+            onTap: _sendAsset,
             icon: 'outgoing-raw',
             label: 'Send',
           ),
+        ),
         //SizedBox(width: screen.canvas.wSpace),
         assetButton(
           onTap: () =>
@@ -356,6 +354,34 @@ class AnimatedCoinSpec extends StatelessWidget {
                   child: buttons())),
         ]);
       });
+
+  void _sendAsset() {
+    if (cubits.holding.state.holding.sats.value > 0) {
+      final Holding assetBlockchainHolding =
+          getHoldingOf(cubits.holding.state.holding.blockchain);
+
+      if (cubits.holding.state.holding.isCurrency ||
+          assetBlockchainHolding.sats.value > 0) {
+        maestro.activateSend();
+      } else {
+        cubits.toast.flash(
+          msg: ToastMessage(
+            duration: Duration(seconds: 2),
+            title: assetBlockchainHolding.symbol,
+            text: 'is required to send',
+          ),
+        );
+      }
+    } else {
+      cubits.toast.flash(
+        msg: ToastMessage(
+          duration: Duration(seconds: 2),
+          title: cubits.holding.state.holding.asset.symbol,
+          text: 'Balance is 0',
+        ),
+      );
+    }
+  }
 }
 
 class TokenToggle extends StatefulWidget {

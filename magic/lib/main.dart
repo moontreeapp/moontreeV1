@@ -121,7 +121,7 @@ class MagicApp extends StatelessWidget {
                 builder: (context) => ScrollConfiguration(
                     behavior: NoGlowScrollBehavior(),
                     child: MultiBlocProvider(
-                      providers: cubits.providers.cast<BlocProvider>(),
+                      providers: cubits.providers,
                       child: Platform.isIOS
                           ? const MaestroLayerIOS()
                           : const MaestroLayer(),

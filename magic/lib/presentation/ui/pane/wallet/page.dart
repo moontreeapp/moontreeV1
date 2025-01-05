@@ -344,7 +344,12 @@ class SimpleIdenticon extends StatelessWidget {
               ? SvgPicture.asset(
                   LogoIcons.appLogo,
                 )
-              : Text(chosenLetter, style: style ?? AppText.identiconLarge),
+              : Center(
+                  child: Text(
+                    chosenLetter,
+                    style: style ?? AppText.identiconLarge,
+                  ),
+                ),
     );
     if (admin == true || blockchain != null) {
       return Stack(
