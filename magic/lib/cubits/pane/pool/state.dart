@@ -6,6 +6,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
   final bool active;
   final String amount;
   final Holding? poolHolding;
+  final List<BalanceAddress>? balanceAddresses;
   final String poolAddress;
   final bool isSubmitting;
   final PoolStatus poolStatus;
@@ -15,6 +16,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
     this.active = false,
     this.amount = '',
     this.poolHolding,
+    this.balanceAddresses,
     this.poolAddress = '',
     this.isSubmitting = false,
     this.poolStatus = PoolStatus.notJoined,
@@ -26,6 +28,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
         active,
         amount,
         poolHolding,
+        balanceAddresses,
         poolAddress,
         isSubmitting,
         poolStatus,
@@ -40,6 +43,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
         active: active,
         amount: amount,
         poolHolding: poolHolding,
+        balanceAddresses: balanceAddresses,
         poolAddress: poolAddress,
         isSubmitting: isSubmitting,
         poolStatus: poolStatus,

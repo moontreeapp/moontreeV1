@@ -14,7 +14,6 @@ import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/sats.dart';
 import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/domain/utils/extensions/list.dart';
-import 'package:magic/domain/wallet/wallets.dart';
 import 'package:magic/presentation/ui/canvas/balance/chips.dart';
 import 'package:magic/presentation/utils/range.dart';
 import 'package:magic/services/calls/holdings.dart';
@@ -120,10 +119,9 @@ class WalletCubit extends UpdatableCubit<WalletState> {
     // remember to order by currency first, amount second, alphabetical third
     update(isSubmitting: true);
     logD('populateAssets');
-    var storedDataString =
-        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
-    var storedData = jsonDecode(storedDataString ?? '{}');
-    String? privateKey = storedData['satori_magic_pool'];
+    var poolActive =
+        await secureStorage.read(key: SecureStorageKey.poolActive.key());
+    bool isPoolActive = poolActive == 'true' ? true : false;
     final holdings = setCorrespondingFlag(_sort(_newRateThese(
             symbolRate: {
               'EVR': await rates.getRateOf('EVR'),
@@ -144,38 +142,20 @@ class WalletCubit extends UpdatableCubit<WalletState> {
               keypairWallets: cubits.keys.master.keypairWallets,
             ).call())));
     logWTF('holdings: $holdings');
-    final poolHolding = _newRateThese(
-        symbolRate: {'SATORI': await rates.getRateOf('SATORI')},
-        holdings: await HoldingBalancesCall(
-          blockchain: Blockchain.evrmoreMain,
-          derivationWallets: [],
-          keypairWallets: privateKey != null
-              ? [KeypairWallet(wif: privateKey)]
-              : cubits.keys.master.keypairWallets,
-        ).call());
-    logWTF('poolHolding: $poolHolding');
-
-    Holding satoriHolding = poolHolding.firstWhere(
-      (element) => element.symbol == 'SATORI',
-      orElse: () => Holding(
-        name: 'Default',
-        symbol: 'SATORI',
-        blockchain: Blockchain.evrmoreMain,
-        sats: Sats(0),
-        metadata: HoldingMetadata(
-          divisibility: Divisibility(8),
-          reissuable: false,
-          supply: Sats.fromCoin(Coin(coin: 0)),
-        ),
-      ),
-    );
-
-    if (satoriHolding.sats.value > 0) {
-      cubits.pool.update(
-        poolStatus: PoolStatus.joined,
-        pooHolding: satoriHolding,
+    if (isPoolActive) {
+      Holding satoriHolding = holdings.firstWhere(
+        (element) => element.symbol == 'SATORI',
+        orElse: () => Holding.empty(),
       );
+      if (satoriHolding.sats.value > 0) {
+        logWTF('pool holding: $satoriHolding');
+        cubits.pool.update(
+          poolStatus: PoolStatus.joined,
+          pooHolding: satoriHolding,
+        );
+      }
     }
+
     if (holdings.isNotEmpty) {
       update(holdings: [], isSubmitting: false);
       update(holdings: holdings, isSubmitting: false);

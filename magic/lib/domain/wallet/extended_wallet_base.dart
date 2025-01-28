@@ -41,13 +41,12 @@ extension ExtendedWalletBase on WalletBase {
   ///
   /// The payload contains [message], [address], [publicKey], and [signature]
   /// to be used for authenticating the wallet.
-  Map<String, String> authPayload() {
+  Map<String, String> authPayload(String address) {
     final String message = _getChallenge();
-
     var sig = signCompact(message);
     var data = <String, String>{
       'message': message,
-      'address': address!,
+      'address': address,
       'pubkey': pubKey!,
       'signature': sig,
     };

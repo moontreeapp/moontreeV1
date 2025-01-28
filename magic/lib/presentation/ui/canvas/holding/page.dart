@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:magic/cubits/canvas/holding/cubit.dart';
 import 'package:magic/cubits/cubit.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
 import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
@@ -17,7 +18,6 @@ import 'package:magic/services/services.dart' show maestro, screen;
 import 'package:magic/presentation/theme/theme.dart';
 import 'package:magic/presentation/widgets/assets/icons.dart';
 import 'package:magic/domain/concepts/asset_icons.dart';
-import 'package:magic/utils/logger.dart';
 
 Holding getHoldingOf(Blockchain blockchain) => cubits.wallet.state.holdings
     .where((x) => x.blockchain == blockchain && x.isCurrency)
@@ -126,28 +126,36 @@ class AnimatedCoinSpec extends StatelessWidget {
           if ((coin?.coin ?? cubits.holding.state.holding.coin.coin) > 0)
             BlocBuilder<HoldingCubit, HoldingState>(
                 builder: (BuildContext context, HoldingState state) {
-              return CoinBalancePriceSimpleView(
-                coin: state.section == HoldingSection.pool
-                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
-                    : coin ?? cubits.holding.state.holding.coin,
-                alt: dollarText,
-                //wholeStyle: AppText.wholeHolding,
-                //partStyle: AppText.partHolding,
-              );
+              return BlocBuilder<PoolCubit, PoolState>(
+                  builder: (BuildContext context, PoolState poolState) {
+                return CoinBalancePriceSimpleView(
+                  coin: state.section == HoldingSection.pool
+                      ? cubits.pool.state.poolHolding?.coin ?? Coin()
+                      : coin ?? cubits.holding.state.holding.coin,
+                  alt: dollarText,
+                  //wholeStyle: AppText.wholeHolding,
+                  //partStyle: AppText.partHolding,
+                );
+              });
             })
           else
             BlocBuilder<HoldingCubit, HoldingState>(
-                builder: (BuildContext context, HoldingState state) {
-              return CoinBalanceView(
-                coin: state.section == HoldingSection.pool
-                    ? cubits.pool.state.poolHolding?.coin ?? Coin()
-                    : coin ?? cubits.holding.state.holding.coin,
-                //wholeStyle: AppText.wholeHolding,
-                //partOneStyle: AppText.partHolding,
-                //partTwoStyle: AppText.partHolding,
-                //partThreeStyle: AppText.partHolding,
-              );
-            })
+              builder: (BuildContext context, HoldingState holdingState) {
+                return BlocBuilder<PoolCubit, PoolState>(
+                  builder: (BuildContext context, PoolState poolState) {
+                    return CoinBalanceView(
+                      coin: holdingState.section == HoldingSection.pool
+                          ? poolState.poolHolding?.coin ?? Coin()
+                          : holdingState.holding.coin,
+                      //wholeStyle: AppText.wholeHolding,
+                      //partOneStyle: AppText.partHolding,
+                      //partTwoStyle: AppText.partHolding,
+                      //partThreeStyle: AppText.partHolding,
+                    );
+                  },
+                );
+              },
+            )
         else ...[
           Text(whole, style: AppText.wholeHolding.copyWith(height: 0)),
           if ((part ?? cubits.holding.state.part) != '')

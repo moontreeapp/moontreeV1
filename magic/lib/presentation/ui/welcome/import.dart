@@ -1,14 +1,12 @@
 import 'dart:io';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:wallet_utils/wallet_utils.dart';
+import 'package:magic/cubits/pane/pool/cubit.dart';
+import 'package:magic/domain/concepts/holding.dart';
+import 'package:magic/services/satori.dart';
 import 'package:magic/cubits/cubit.dart';
-import 'package:magic/domain/blockchain/blockchain.dart';
-import 'package:magic/domain/blockchain/exposure.dart';
 import 'package:magic/domain/blockchain/mnemonic.dart';
 import 'package:magic/domain/storage/secure.dart';
-import 'package:magic/domain/wallet/extended_wallet_base.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/utils/animation.dart';
 import 'package:magic/presentation/widgets/other/app_button.dart';
@@ -144,32 +142,39 @@ class ImportPageState extends State<ImportPage> {
 
   Future<void> retrievePoolHolding() async {
     try {
-      final lastIndex = await cubits.pool.getLastIndex(
-        blockchain: Blockchain.evrmoreMain,
-        exposure: Exposure.external,
-      );
+      // var satoriData = cubits.pool.state.balanceAddresses?.firstWhereOrNull(
+      //   (element) => element.symbol.toLowerCase() == 'satori',
+      // );
+      //
+      // if (satoriData == null || satoriData.addresses.isEmpty) {
+      //   logE('Satori data not found');
+      //   return;
+      // }
 
-      final privateKey = cubits.keys.master.derivationWallets.last
-          .seedWallet(Blockchain.evrmoreMain)
-          .subwallet(
-            hdIndex: lastIndex,
-            exposure: Exposure.external,
-          )
-          .keyPair
-          .toWIF();
+      List<String> satoriAddresses = await cubits.pool.findAllWalletAddresses();
+      SatoriServerClient satoriClient = SatoriServerClient();
 
-      KPWallet kpWallet = KPWallet.fromWIF(
-        privateKey,
-        Blockchain.evrmoreMain.network,
-      );
+      final rewardAddress = await satoriClient
+          .getRewardAddresses(addresses: [satoriAddresses.first]);
 
-      await secureStorage.write(
-        key: SecureStorageKey.satoriMagicPool.key(),
-        value: jsonEncode({
-          "satori_magic_pool": kpWallet.wif,
-          "address": kpWallet.address,
-        }),
-      );
+      if (rewardAddress.isNotEmpty &&
+          rewardAddress.containsValue(satoriAddresses.first)) {
+        await secureStorage.write(
+          key: SecureStorageKey.poolActive.key(),
+          value: 'true',
+        );
+        Holding satoriHolding = cubits.wallet.state.holdings.firstWhere(
+          (element) => element.symbol == 'SATORI',
+          orElse: () => Holding.empty(),
+        );
+
+        if (satoriHolding.sats.value > 0) {
+          cubits.pool.update(
+            poolStatus: PoolStatus.joined,
+            pooHolding: satoriHolding,
+          );
+        }
+      }
     } catch (e, st) {
       logE('$e,$st');
     }

@@ -5,8 +5,8 @@ import 'package:web3dart/crypto.dart';
 import 'package:web3dart/web3dart.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart';
 import 'package:magic/utils/logger.dart';
+
 class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
@@ -20,6 +20,7 @@ class SatoriServerClient {
 
   Future<bool> registerWallet({
     required KPWallet kpWallet,
+    required String rewardAddress,
   }) async {
     try {
       final String privateKey = kpWallet.wif!;
@@ -31,11 +32,10 @@ class SatoriServerClient {
         "vaultpubkey": kpWallet.pubKey,
         "vaultaddress": kpWallet.address,
         "ethaddress": ethAddress.hex,
-        "rewardaddress": kpWallet.address,
+        "rewardaddress": rewardAddress,
       };
 
-      Map<String, String> headers = kpWallet.authPayload();
-      logW('body: $body');
+      Map<String, String> headers = kpWallet.authPayload(kpWallet.address!);
       final http.Response response = await http.post(
         Uri.parse('$url/register/wallet'),
         headers: headers,
@@ -50,6 +50,40 @@ class SatoriServerClient {
     } catch (e, st) {
       logE('Error during checkin: $e\n$st');
       return false;
+    }
+  }
+
+  Future<Map<String, String>> getRewardAddresses({
+    required List<String> addresses,
+  }) async {
+    try {
+      final body = {
+        'addresses': addresses,
+      };
+      final response = await http.post(
+        Uri.parse('$url/api/v0/addresses/rewardaddresses'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        if (jsonData.values.contains("address not found")) {
+          logE("One or more addresses were not found: $jsonData");
+          return jsonData.map((key, value) => MapEntry(key, value as String));
+        }
+
+        return jsonData.map((key, value) => MapEntry(key, value as String));
+      } else {
+        logE('Error Response: ${response.body}');
+        return {};
+      }
+    } catch (e) {
+      logE('Exception: $e');
+      return {};
     }
   }
 }

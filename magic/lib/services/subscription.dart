@@ -4,8 +4,10 @@ import 'package:magic/cubits/toast/cubit.dart';
 import 'package:magic/domain/blockchain/blockchain.dart';
 import 'package:magic/domain/concepts/holding.dart';
 import 'package:magic/domain/concepts/numbers/coin.dart';
+import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/domain/utils/extensions/string.dart';
 import 'package:magic/domain/wallet/wallets.dart';
+import 'package:magic/services/services.dart';
 import 'package:magic/utils/logger.dart';
 import 'package:serverpod_client/serverpod_client.dart';
 import 'package:magic/domain/server/serverv2_client.dart' as server;
@@ -217,6 +219,23 @@ class SubscriptionService {
         title: 'Received $symbol:',
         text: '+${Coin.fromInt(satsConfirmed + satsUnconfirmed).humanString()}',
       ));
+    }
+    if (symbol.toLowerCase() == 'satori') {
+      final receiveAddress = cubits.keys.master.derivationWallets.last
+          .seedWallet(Blockchain.evrmoreMain)
+          .externals
+          .lastOrNull
+          ?.address;
+
+      var poolActive =
+          await secureStorage.read(key: SecureStorageKey.poolActive.key());
+      bool isPoolActive = poolActive == 'true' ? true : false;
+      logD('isPoolActive: $isPoolActive $receiveAddress');
+
+      if (receiveAddress != null && isPoolActive) {
+        await cubits.pool
+            .registerAddressOnSatoriTransaction(address: receiveAddress);
+      }
     }
     await Future.delayed(const Duration(seconds: 1));
     await cubits.wallet.populateAssets(); // chain specific

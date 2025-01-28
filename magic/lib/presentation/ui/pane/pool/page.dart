@@ -107,26 +107,14 @@ class PoolContentState extends State<PoolContent> {
             //     );
             //   },
             // ),
+
             if (secureStorageAddress != null &&
                 secureStorageAddress!.isNotEmpty)
               PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
               onPressed: () => validateBalance()
                   ? {
-                      if (widget.addMore)
-                        {
-                          cubits.pool.addMoreToPool(
-                            amount: amountText.text,
-                          ),
-                          amountText.clear(),
-                        }
-                      else
-                        {
-                          cubits.pool.joinPool(
-                            amount: cubits.holding.state.holding.coin.entire(),
-                          ),
-                          amountText.clear(),
-                        }
+                      cubits.pool.joinPool(),
                     }
                   : /*cubits.toast.flash(
                       msg: const ToastMessage(
@@ -349,72 +337,72 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
 
 class PoolAddress extends StatelessWidget {
   final String secureStorageAddress;
+
   const PoolAddress({super.key, required this.secureStorageAddress});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 64,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: AppColors.black.withValues(alpha: .16),
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CurrencyIdenticon(
-            holding: cubits.holding.state.holding,
-            width: 24,
-            height: 24,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Text('Your Reward Address',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: AppColors.white.withValues(alpha: .88))),
+        Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: AppColors.black.withValues(alpha: .16),
+            borderRadius: BorderRadius.circular(30),
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                itemCount: 1,
-                itemBuilder: (context, index) => FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: SelectableText.rich(
-                        TextSpan(
-                          text: '',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                  color:
-                                      AppColors.white.withValues(alpha: .44)),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: secureStorageAddress.substring(0, 6),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: secureStorageAddress.substring(
-                                  6, secureStorageAddress.length - 6),
-                            ),
-                            TextSpan(
-                              text: secureStorageAddress
-                                  .substring(secureStorageAddress.length - 6),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CurrencyIdenticon(
+                holding: cubits.holding.state.holding,
+                width: 24,
+                height: 24,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                  child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: SelectableText.rich(
+                  TextSpan(
+                    text: '',
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: AppColors.white.withValues(alpha: .44)),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: secureStorageAddress.substring(0, 6),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                    )),
+                      TextSpan(
+                        text: secureStorageAddress.substring(
+                            6, secureStorageAddress.length - 6),
+                      ),
+                      TextSpan(
+                        text: secureStorageAddress
+                            .substring(secureStorageAddress.length - 6),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
+              IconButton(
+                style: IconButton.styleFrom(),
+                icon: const Icon(Icons.copy),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: secureStorageAddress));
+                },
+              )
+            ],
           ),
-          IconButton(
-            style: IconButton.styleFrom(),
-            icon: const Icon(Icons.copy),
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: secureStorageAddress));
-            },
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
