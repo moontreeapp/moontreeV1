@@ -108,9 +108,10 @@ class PoolContentState extends State<PoolContent> {
             //   },
             // ),
 
-            if (secureStorageAddress != null &&
-                secureStorageAddress!.isNotEmpty)
-              PoolAddress(secureStorageAddress: secureStorageAddress!),
+            const SizedBox(height: 8),
+            /// //if (secureStorageAddress != null &&
+            /// //    secureStorageAddress!.isNotEmpty)
+            /// //  PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
               onPressed: () => validateBalance()
                   ? {
@@ -123,11 +124,11 @@ class PoolContentState extends State<PoolContent> {
                       ),
                     )*/
                   cubits.toast.flash(
-                      msg: const ToastMessage(
-                        title: '',
-                        text: 'No balance in selected asset',
-                      ),
+                    msg: const ToastMessage(
+                      title: '',
+                      text: 'No balance in selected asset',
                     ),
+                  ),
               label: widget.addMore ? 'ADD TO POOL' : 'JOIN POOL',
             ),
           ],
@@ -296,9 +297,11 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
             //   label: 'ADD MORE',
             // ),
             // const SizedBox(height: 8),
-            if (secureStorageAddress != null &&
-                secureStorageAddress!.isNotEmpty)
-              PoolAddress(secureStorageAddress: secureStorageAddress!),
+
+            const SizedBox(height: 8),
+            /// //if (secureStorageAddress != null &&
+            /// //    secureStorageAddress!.isNotEmpty)
+            /// //  PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
               onPressed: () {
                 showAppDialog(

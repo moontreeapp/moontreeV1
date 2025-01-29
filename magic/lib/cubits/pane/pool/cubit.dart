@@ -234,19 +234,73 @@ class PoolCubit extends UpdatableCubit<PoolState> {
         update(isSubmitting: false, poolStatus: PoolStatus.joined);
       } else {
         logE('Failed to join the pool');
+        cubits.toast.flash(
+          msg: const ToastMessage(
+            title: '',
+            text: 'Failed to join the pool',
+          ),
+        );
         update(isSubmitting: false);
       }
     } catch (e, st) {
       logE('Error during join pool: $e $st');
+      cubits.toast.flash(
+        msg: const ToastMessage(
+          title: '',
+          text: 'Failed to join the pool',
+        ),
+      );
       update(isSubmitting: false);
     }
+    cubits.toast.flash(
+      msg: const ToastMessage(
+        title: 'Success!',
+        text: 'Magic Pool Joined',
+      ),
+    );
   }
 
   Future<void> leavePool() async {
     try {
       await _fadeOutAndIn();
 
-      //Todo: Implement the logic for leaving the pool
+      List<String> satoriAddresses = await findAllWalletAddresses();
+      final privateKeys = await findSatoriBalanceWIFs(satoriAddresses);
+
+      if (privateKeys.isEmpty) {
+        logE('No WIFs found');
+        update(isSubmitting: false);
+        return;
+      }
+
+      List<KPWallet> kpWallets = privateKeys.map((wif) {
+        return KPWallet.fromWIF(wif, Blockchain.evrmoreMain.network);
+      }).toList();
+
+      SatoriServerClient satoriClient = SatoriServerClient();
+
+      const int batchSize = 10;
+      bool allLeft = true;
+
+      for (int i = 0; i < kpWallets.length; i += batchSize) {
+        final batch = kpWallets.skip(i).take(batchSize).toList();
+
+        bool batchLeavePool = await Future.wait(batch.map((kpWallet) async {
+          return await satoriClient.removeLentStake(kpWallet: kpWallet);
+        })).then((results) => results.every((result) => result));
+
+        if (!batchLeavePool) {
+          allLeft = false;
+          break;
+        }
+      }
+
+      /// if there's an issue we don't necessarily have to stop short.
+      /// TODO: explore what to do here
+      //if (!allLeft) {
+      //  update(isSubmitting: false);
+      //  return;
+      //}
 
       await secureStorage.write(
         key: SecureStorageKey.poolActive.key(),
@@ -269,6 +323,12 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       );
       update(isSubmitting: false);
     }
+    cubits.toast.flash(
+      msg: const ToastMessage(
+        title: 'Success!',
+        text: 'Magic Pool Joined',
+      ),
+    );
   }
 
   Future<void> registerAddressOnSatoriTransaction({

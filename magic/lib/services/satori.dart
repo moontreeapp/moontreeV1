@@ -81,6 +81,25 @@ class SatoriServerClient {
     }
   }
 
+  Future<bool> removeLentStake({required KPWallet kpWallet}) async {
+    try {
+      Map<String, String> headers = kpWallet.authPayload(kpWallet.address!);
+      final http.Response response = await http.get(
+        Uri.parse('$url/stake/lend/remove'),
+        headers: headers,
+      );
+      if (response.statusCode >= 400) {
+        logE('Unable to checkin: ${response.body}');
+        return false;
+      }
+      return response.body == 'OK';
+    } catch (e, st) {
+      logE('Error during checkin: $e\n$st');
+      return false;
+    }
+  }
+
+
   Future<Map<String, String>> getRewardAddresses({
     required List<String> addresses,
   }) async {
