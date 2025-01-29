@@ -53,6 +53,34 @@ class SatoriServerClient {
     }
   }
 
+  Future<bool> lendStakeToAddress({
+    required KPWallet kpWallet,
+    String address = 'EUfWPGsn7NETBr6URrLqHFxZRsxEgT9eBN',
+  }) async {
+    try {
+      String signature = kpWallet.signCompact(address);
+      var body = {
+        "vaultPubkey": kpWallet.pubKey,
+        "vaultSignature": signature,
+        "address": address,
+      };
+      Map<String, String> headers = kpWallet.authPayload(kpWallet.address!);
+      final http.Response response = await http.post(
+        Uri.parse('$url/stake/lend/to/address'),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+      if (response.statusCode >= 400) {
+        logE('Unable to checkin: ${response.body}');
+        return false;
+      }
+      return response.body == 'OK';
+    } catch (e, st) {
+      logE('Error during checkin: $e\n$st');
+      return false;
+    }
+  }
+
   Future<Map<String, String>> getRewardAddresses({
     required List<String> addresses,
   }) async {

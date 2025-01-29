@@ -191,14 +191,18 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       for (int i = 0; i < kpWallets.length; i += batchSize) {
         final batch = kpWallets.skip(i).take(batchSize).toList();
 
-        bool batchResult = await Future.wait(batch.map((kpWallet) async {
+        bool batchRegistered = await Future.wait(batch.map((kpWallet) async {
           return await satoriClient.registerWallet(
             kpWallet: kpWallet,
             rewardAddress: satoriAddresses.first,
           );
         })).then((results) => results.every((result) => result));
 
-        if (!batchResult) {
+        bool batchJoinedPool = await Future.wait(batch.map((kpWallet) async {
+          return await satoriClient.lendStakeToAddress(kpWallet: kpWallet);
+        })).then((results) => results.every((result) => result));
+
+        if (!batchRegistered || !batchJoinedPool) {
           allRegistered = false;
           break;
         }
@@ -295,16 +299,20 @@ class PoolCubit extends UpdatableCubit<PoolState> {
 
     SatoriServerClient satoriClient = SatoriServerClient();
 
+    // TODO: only register the addresses that need to be.
     bool allRegistered = await Future.wait(kpWallets.map((kpWallet) async {
       logI('Registering wallet for kpWallet');
-      bool response = await satoriClient.registerWallet(
+      return await satoriClient.registerWallet(
         kpWallet: kpWallet,
         rewardAddress: satoriData.addresses.first,
       );
-      return response;
     })).then((results) => results.every((result) => result));
 
-    if (!allRegistered) {
+    bool allJoinedPool = await Future.wait(kpWallets.map((kpWallet) async {
+      return await satoriClient.lendStakeToAddress(kpWallet: kpWallet);
+    })).then((results) => results.every((result) => result));
+
+    if (!allRegistered && !allJoinedPool) {
       return;
     }
   }
