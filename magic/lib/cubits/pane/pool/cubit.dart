@@ -326,7 +326,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     cubits.toast.flash(
       msg: const ToastMessage(
         title: 'Success!',
-        text: 'Magic Pool Joined',
+        text: 'Exited Magic Pool',
       ),
     );
   }
