@@ -253,10 +253,10 @@ class PoolCubit extends UpdatableCubit<PoolState> {
         }
       }
 
-      //if (!allRegistered) {
-      //  update(isSubmitting: false);
-      //  return;
-      //}
+      if (!allRegistered) {
+        update(isSubmitting: false);
+        return;
+      }
 
       // verify we have joined the pool
       final rewardAddresses = await satoriClient.getRewardAddresses(

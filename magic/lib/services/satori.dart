@@ -11,8 +11,8 @@ class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
 
-  //SatoriServerClient({this.url = 'https://stage.satorinet.io'});
-  SatoriServerClient({this.url = 'http://137.184.38.160'});
+  //SatoriServerClient({this.url = 'http://137.184.38.160'});
+  SatoriServerClient({this.url = 'https://stage.satorinet.io'});
 
   String convertWIFToHex(String wifKey) {
     final decoded = wif.decode(wifKey);
