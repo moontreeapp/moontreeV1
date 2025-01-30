@@ -70,6 +70,15 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     ));
   }
 
+  void setPoolAddress() {
+    var satoriData = state.balanceAddresses?.firstWhereOrNull(
+      (element) => element.symbol.toLowerCase() == 'satori',
+    );
+    if (satoriData != null && satoriData.addresses.isNotEmpty) {
+      update(poolAddress: satoriData.addresses.first);
+    }
+  }
+
   Future<int> getLastIndex({
     required Blockchain blockchain,
     required Exposure exposure,
@@ -105,23 +114,40 @@ class PoolCubit extends UpdatableCubit<PoolState> {
   ) async {
     List<DerivationWallet> derivationWallets =
         cubits.keys.master.derivationWallets;
+    List<KeypairWallet> keypairWallets = cubits.keys.master.keypairWallets;
     List<String> wifs = [];
-    for (var derivationWallet in derivationWallets) {
-      for (var seedWallet in derivationWallet.seedWallets.values) {
-        for (var subWalletList in List.of(seedWallet.subwallets.values)) {
-          for (var subWallet in List.of(subWalletList)) {
-            if (satoriAddresses.contains(subWallet.address)) {
-              String privateKey = derivationWallet
-                  .seedWallet((subWallet as HDWalletIndexed).blockchain)
-                  .subwallet(
-                    hdIndex: subWallet.hdIndex,
-                    exposure: subWallet.exposure,
-                  )
-                  .keyPair
-                  .toWIF();
 
-              wifs.add(privateKey);
+    if (derivationWallets.isNotEmpty) {
+      for (var derivationWallet in derivationWallets) {
+        for (var seedWallet in derivationWallet.seedWallets.values) {
+          for (var subWalletList in List.of(seedWallet.subwallets.values)) {
+            for (var subWallet in List.of(subWalletList)) {
+              if (satoriAddresses.contains(subWallet.address)) {
+                String privateKey = derivationWallet
+                    .seedWallet((subWallet as HDWalletIndexed).blockchain)
+                    .subwallet(
+                      hdIndex: subWallet.hdIndex,
+                      exposure: subWallet.exposure,
+                    )
+                    .keyPair
+                    .toWIF();
+
+                wifs.add(privateKey);
+              }
             }
+          }
+        }
+      }
+    }
+    if (keypairWallets.isNotEmpty) {
+      for (var keypairWallet in cubits.keys.master.keypairWallets) {
+        for (var kpWallet in keypairWallet.wallets.values) {
+          if (satoriAddresses.contains(kpWallet.address)) {
+            wifs.add(keypairWallet.wif);
+            logWTF(
+              'Keypair Wallet Address: ${kpWallet.address}\nPrivate Key: '
+              '${keypairWallet.wif}',
+            );
           }
         }
       }
@@ -136,21 +162,36 @@ class PoolCubit extends UpdatableCubit<PoolState> {
   Future<List<String>> findAllWalletAddresses() async {
     List<DerivationWallet> derivationWallets =
         cubits.keys.master.derivationWallets;
+    List<KeypairWallet> keypairWallets = cubits.keys.master.keypairWallets;
+
     List<String> allAddresses = [];
 
-    for (var derivationWallet in derivationWallets) {
-      for (var seedWallet in derivationWallet.seedWallets.values) {
-        if (seedWallet.blockchain == Blockchain.evrmoreMain) {
-          for (var subWalletList in List.of(seedWallet.subwallets.values)) {
-            for (var subWallet in List.of(subWalletList)) {
-              if (subWallet.address != null) {
-                allAddresses.add(subWallet.address!);
+    if (derivationWallets.isNotEmpty) {
+      for (var derivationWallet in derivationWallets) {
+        for (var seedWallet in derivationWallet.seedWallets.values) {
+          if (seedWallet.blockchain == Blockchain.evrmoreMain) {
+            for (var subWalletList in List.of(seedWallet.subwallets.values)) {
+              for (var subWallet in List.of(subWalletList)) {
+                if (subWallet.address != null) {
+                  allAddresses.add(subWallet.address!);
+                }
               }
             }
           }
         }
       }
     }
+
+    if (keypairWallets.isNotEmpty) {
+      for (var keypairWallet in keypairWallets) {
+        for (var kpWallet in keypairWallet.wallets.values) {
+          if (kpWallet.address != null) {
+            allAddresses.add(kpWallet.address!);
+          }
+        }
+      }
+    }
+
     allAddresses = allAddresses.toSet().toList();
     logI('Total unique addresses found: ${allAddresses.length}');
     return allAddresses;
@@ -159,6 +200,8 @@ class PoolCubit extends UpdatableCubit<PoolState> {
   Future<void> joinPool() async {
     try {
       await _fadeOutAndIn();
+      //Todo: remove when fix screen freeze issue
+      await Future.delayed(const Duration(milliseconds: 500));
 
       // var satoriData = state.balanceAddresses?.firstWhereOrNull(
       //   (element) => element.symbol.toLowerCase() == 'satori',
@@ -183,6 +226,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
         return KPWallet.fromWIF(wif, Blockchain.evrmoreMain.network);
       }).toList();
 
+
       SatoriServerClient satoriClient = SatoriServerClient();
 
       const int batchSize = 10;
@@ -202,30 +246,32 @@ class PoolCubit extends UpdatableCubit<PoolState> {
           return await satoriClient.lendStakeToAddress(kpWallet: kpWallet);
         })).then((results) => results.every((result) => result));
 
-        if (!batchRegistered || !batchJoinedPool) {
+        if (!batchRegistered && !batchJoinedPool) {
+          // its ok if some file to register - they might already be registered
           allRegistered = false;
           break;
         }
       }
 
-      if (!allRegistered) {
-        update(isSubmitting: false);
-        return;
-      }
+      //if (!allRegistered) {
+      //  update(isSubmitting: false);
+      //  return;
+      //}
 
-      final rewardAddress = await satoriClient.getRewardAddresses(
+      // verify we have joined the pool
+      final rewardAddresses = await satoriClient.getRewardAddresses(
         addresses: [satoriAddresses.first],
       );
-
-      if (rewardAddress.isNotEmpty &&
-          rewardAddress.containsValue(satoriAddresses.first)) {
+      if (rewardAddresses.isNotEmpty &&
+          rewardAddresses.containsValue(satoriAddresses.first)) {
         await secureStorage.write(
-          key: SecureStorageKey.poolActive.key(),
-          value: 'true',
+          key: SecureStorageKey.poolAddress.key(),
+          value: rewardAddresses.values.first,
         );
         Holding satoriHolding = cubits.holding.state.holding;
         if (satoriHolding.sats.value > 0) {
           cubits.pool.update(
+            poolAddress: satoriAddresses.first,
             poolStatus: PoolStatus.joined,
             pooHolding: satoriHolding,
           );
@@ -263,6 +309,9 @@ class PoolCubit extends UpdatableCubit<PoolState> {
   Future<void> leavePool() async {
     try {
       await _fadeOutAndIn();
+
+      //Todo: remove when fix screen freeze issue
+      await Future.delayed(const Duration(milliseconds: 500));
 
       List<String> satoriAddresses = await findAllWalletAddresses();
       final privateKeys = await findSatoriBalanceWIFs(satoriAddresses);
@@ -303,12 +352,13 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       //}
 
       await secureStorage.write(
-        key: SecureStorageKey.poolActive.key(),
-        value: 'false',
+        key: SecureStorageKey.poolAddress.key(),
+        value: '',
       );
 
       update(
         isSubmitting: false,
+        poolAddress: '',
         pooHolding: Holding.empty(),
         poolStatus: PoolStatus.notJoined,
       );

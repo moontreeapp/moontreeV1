@@ -4,7 +4,7 @@ enum SecureStorageKey {
   mnemonics,
   wifs,
   authed,
-  satoriMagicPool,
+  poolAddress,
   poolActive;
 
   String key([String? id]) {
@@ -15,8 +15,8 @@ enum SecureStorageKey {
         return 'wifs';
       case SecureStorageKey.authed:
         return 'authed';
-      case SecureStorageKey.satoriMagicPool:
-        return 'satoriMagicPool';
+      case SecureStorageKey.poolAddress:
+        return 'poolAddress';
       case SecureStorageKey.poolActive:
         return 'poolActive';
     }

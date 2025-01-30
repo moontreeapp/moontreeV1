@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:magic/domain/storage/secure.dart';
 import 'package:magic/presentation/theme/colors.dart';
 import 'package:magic/presentation/ui/pane/pool/pool_placeholder.dart';
 import 'package:magic/presentation/ui/pane/wallet/page.dart';
@@ -58,12 +55,15 @@ class PoolContentState extends State<PoolContent> {
   bool amountDollars = false;
   bool automaticConversion = false;
   bool userChanged = false;
-  String? secureStorageAddress;
+  bool showPoolAddress = false;
 
   @override
   void initState() {
+    cubits.pool.setPoolAddress();
+    logWTF(cubits.pool.state.poolAddress);
+    showPoolAddress = cubits.pool.state.poolAddress != null &&
+        cubits.pool.state.poolAddress!.isNotEmpty;
     super.initState();
-    _retrieveSecureStorageAddress();
   }
 
   @override
@@ -91,10 +91,9 @@ class PoolContentState extends State<PoolContent> {
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 24, bottom: 24),
         child: Column(
-          mainAxisAlignment:
-              (secureStorageAddress != null && secureStorageAddress!.isNotEmpty)
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.end,
+          mainAxisAlignment: showPoolAddress
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.end,
           children: [
             // BlocBuilder<PoolCubit, PoolState>(
             //   builder: (BuildContext context, PoolState state) {
@@ -107,16 +106,14 @@ class PoolContentState extends State<PoolContent> {
             //     );
             //   },
             // ),
-
-            const SizedBox(height: 8),
-            /// //if (secureStorageAddress != null &&
-            /// //    secureStorageAddress!.isNotEmpty)
-            /// //  PoolAddress(secureStorageAddress: secureStorageAddress!),
+            showPoolAddress
+                ? PoolAddress(
+                    secureStorageAddress: cubits.pool.state.poolAddress!,
+                  )
+                : const SizedBox.shrink(),
             AppButton(
               onPressed: () => validateBalance()
-                  ? {
-                      cubits.pool.joinPool(),
-                    }
+                  ? {cubits.pool.joinPool()}
                   : /*cubits.toast.flash(
                       msg: const ToastMessage(
                         title: 'Unable to Continue:',
@@ -124,11 +121,11 @@ class PoolContentState extends State<PoolContent> {
                       ),
                     )*/
                   cubits.toast.flash(
-                    msg: const ToastMessage(
-                      title: '',
-                      text: 'No balance in selected asset',
+                      msg: const ToastMessage(
+                        title: '',
+                        text: 'No balance in selected asset',
+                      ),
                     ),
-                  ),
               label: widget.addMore ? 'ADD TO POOL' : 'JOIN POOL',
             ),
           ],
@@ -237,23 +234,6 @@ class PoolContentState extends State<PoolContent> {
       ),
     );
   }
-
-  Future<void> _retrieveSecureStorageAddress() async {
-    var storedDataString =
-        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
-    var storedData = jsonDecode(storedDataString ?? '{}');
-
-    if (storedData == null ||
-        !storedData.containsKey('address') ||
-        !storedData.containsKey('satori_magic_pool')) {
-      logW('Stored data is incomplete or missing');
-      return;
-    }
-
-    setState(() {
-      secureStorageAddress = storedData['address'];
-    });
-  }
 }
 
 class JoinedPoolContent extends StatefulWidget {
@@ -264,12 +244,14 @@ class JoinedPoolContent extends StatefulWidget {
 }
 
 class JoinedPoolContentState extends State<JoinedPoolContent> {
-  String? secureStorageAddress;
+  bool showPoolAddress = false;
 
   @override
   void initState() {
+    cubits.pool.setPoolAddress();
+    showPoolAddress = cubits.pool.state.poolAddress != null &&
+        cubits.pool.state.poolAddress!.isNotEmpty;
     super.initState();
-    _retrieveSecureStorageAddress();
   }
 
   @override
@@ -282,10 +264,9 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
           bottom: 24,
         ),
         child: Column(
-          mainAxisAlignment:
-              (secureStorageAddress != null && secureStorageAddress!.isNotEmpty)
-                  ? MainAxisAlignment.spaceBetween
-                  : MainAxisAlignment.end,
+          mainAxisAlignment: showPoolAddress
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.end,
           children: [
             //Todo: Un-hide when server fixed
             // AppButton(
@@ -297,11 +278,12 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
             //   label: 'ADD MORE',
             // ),
             // const SizedBox(height: 8),
+            showPoolAddress
+                ? PoolAddress(
+                    secureStorageAddress: cubits.pool.state.poolAddress!,
+                  )
+                : const SizedBox.shrink(),
 
-            const SizedBox(height: 8),
-            /// //if (secureStorageAddress != null &&
-            /// //    secureStorageAddress!.isNotEmpty)
-            /// //  PoolAddress(secureStorageAddress: secureStorageAddress!),
             AppButton(
               onPressed: () {
                 showAppDialog(
@@ -314,28 +296,19 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
                   },
                 );
               },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(200),
+                side: const BorderSide(
+                  color: AppColors.button,
+                  width: 1,
+                ),
+              ),
+              buttonColor: Colors.transparent,
               label: 'LEAVE POOL',
             ),
           ],
         ),
       );
-
-  Future<void> _retrieveSecureStorageAddress() async {
-    var storedDataString =
-        await secureStorage.read(key: SecureStorageKey.satoriMagicPool.key());
-    var storedData = jsonDecode(storedDataString ?? '{}');
-
-    if (storedData == null ||
-        !storedData.containsKey('address') ||
-        !storedData.containsKey('satori_magic_pool')) {
-      logE('Stored data is incomplete or missing');
-      return;
-    }
-
-    setState(() {
-      secureStorageAddress = storedData['address'];
-    });
-  }
 }
 
 class PoolAddress extends StatelessWidget {

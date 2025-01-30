@@ -11,7 +11,8 @@ class SatoriServerClient {
   final String url;
   double lastCheckin = 0;
 
-  SatoriServerClient({this.url = 'https://stage.satorinet.io'});
+  //SatoriServerClient({this.url = 'https://stage.satorinet.io'});
+  SatoriServerClient({this.url = 'http://137.184.38.160'});
 
   String convertWIFToHex(String wifKey) {
     final decoded = wif.decode(wifKey);
@@ -59,19 +60,17 @@ class SatoriServerClient {
   }) async {
     try {
       String signature = kpWallet.signCompact(address);
-      var body = {
-        "vaultPubkey": kpWallet.pubKey,
-        "vaultSignature": signature,
-        "address": address,
-      };
-      Map<String, String> headers = kpWallet.authPayload(kpWallet.address!);
-      final http.Response response = await http.post(
-        Uri.parse('$url/stake/lend/to/address'),
-        headers: headers,
-        body: jsonEncode(body),
-      );
+      final http.Response response =
+          await http.post(Uri.parse('$url/stake/lend/to/address/standalone'),
+              body: jsonEncode({
+                "address": kpWallet.address,
+                "pubkey": kpWallet.pubKey,
+                "signature": signature,
+                "recipient": address,
+              }));
       if (response.statusCode >= 400) {
-        logE('Unable to checkin: ${response.body}');
+        logE(
+            'Unable to checkin: ${response.body} | ${kpWallet.address} | ${kpWallet.pubKey} | $signature | $address');
         return false;
       }
       return response.body == 'OK';
@@ -98,7 +97,6 @@ class SatoriServerClient {
       return false;
     }
   }
-
 
   Future<Map<String, String>> getRewardAddresses({
     required List<String> addresses,

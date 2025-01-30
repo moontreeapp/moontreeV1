@@ -160,8 +160,8 @@ class ImportPageState extends State<ImportPage> {
       if (rewardAddress.isNotEmpty &&
           rewardAddress.containsValue(satoriAddresses.first)) {
         await secureStorage.write(
-          key: SecureStorageKey.poolActive.key(),
-          value: 'true',
+          key: SecureStorageKey.poolAddress.key(),
+          value: rewardAddress.values.first,
         );
         Holding satoriHolding = cubits.wallet.state.holdings.firstWhere(
           (element) => element.symbol == 'SATORI',

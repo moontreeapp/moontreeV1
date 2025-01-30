@@ -227,9 +227,9 @@ class SubscriptionService {
           .lastOrNull
           ?.address;
 
-      var poolActive =
-          await secureStorage.read(key: SecureStorageKey.poolActive.key());
-      bool isPoolActive = poolActive == 'true' ? true : false;
+      var poolAddress =
+          await secureStorage.read(key: SecureStorageKey.poolAddress.key());
+      bool isPoolActive = (poolAddress != null && poolAddress.isNotEmpty);
       logD('isPoolActive: $isPoolActive $receiveAddress');
 
       if (receiveAddress != null && isPoolActive) {

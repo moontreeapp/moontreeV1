@@ -7,7 +7,7 @@ class PoolState with EquatableMixin, PriorActiveStateMixin {
   final String amount;
   final Holding? poolHolding;
   final List<BalanceAddress>? balanceAddresses;
-  final String poolAddress;
+  final String? poolAddress;
   final bool isSubmitting;
   final PoolStatus poolStatus;
   final PoolState? prior;

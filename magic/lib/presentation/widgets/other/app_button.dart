@@ -11,6 +11,7 @@ class AppButton extends StatelessWidget {
     required this.label,
     this.buttonColor = AppColors.button,
     this.textColor = AppColors.white,
+    this.shape,
     this.isDisabled = false,
     this.fontSize = 16,
     this.height = 64,
@@ -22,6 +23,7 @@ class AppButton extends StatelessWidget {
   final String label;
   final Color buttonColor;
   final Color textColor;
+  final OutlinedBorder? shape;
   final bool isDisabled;
   final double fontSize;
   final double height;
@@ -37,9 +39,10 @@ class AppButton extends StatelessWidget {
           elevation: 0,
           backgroundColor: buttonColor,
           fixedSize: Size(double.maxFinite, height),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28 * 100),
-          ),
+          shape: shape ??
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28 * 100),
+              ),
           shadowColor: Colors.transparent,
           overlayColor: AppColors.white.withValues(alpha: 0.12),
           padding: const EdgeInsets.symmetric(vertical: 10),

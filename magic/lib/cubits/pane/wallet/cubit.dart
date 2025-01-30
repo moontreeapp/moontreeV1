@@ -119,9 +119,9 @@ class WalletCubit extends UpdatableCubit<WalletState> {
     // remember to order by currency first, amount second, alphabetical third
     update(isSubmitting: true);
     logD('populateAssets');
-    var poolActive =
-        await secureStorage.read(key: SecureStorageKey.poolActive.key());
-    bool isPoolActive = poolActive == 'true' ? true : false;
+    var poolAddress =
+        await secureStorage.read(key: SecureStorageKey.poolAddress.key());
+    bool isPoolActive = (poolAddress != null && poolAddress.isNotEmpty);
     final holdings = setCorrespondingFlag(_sort(_newRateThese(
             symbolRate: {
               'EVR': await rates.getRateOf('EVR'),
