@@ -49,3 +49,20 @@ releases/*
 *ios/Podfile.lock
 *ios/Runner/*
 *ios/Runner.xcodeproj/*
+
+# Security
+*.env
+*.jks
+*.keystore
+*.p12
+*.p8
+*.mobileprovision
+*.provisionprofile
+*.cer
+*.pem
+*.key
+*.crt
+*.asc
+*.gpg
+*.asc
+*.gpg

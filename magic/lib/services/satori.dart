@@ -54,6 +54,32 @@ class SatoriServerClient {
     }
   }
 
+  Future<bool> setRewardAddress({
+    required KPWallet kpWallet,
+    required String rewardAddress,
+  }) async {
+    try {
+      final http.Response response = await http.post(
+        Uri.parse('$url/mine/to/address'),
+        headers: kpWallet.authPayload(kpWallet.address!),
+        body: jsonEncode({
+          "vaultpubkey": kpWallet.pubKey,
+          "vaultaddress": kpWallet.address,
+          "rewardaddress": rewardAddress,
+        }),
+      );
+      if (response.statusCode >= 400) {
+        logE('Unable to checkin: ${response.body}');
+        return false;
+      }
+      lastCheckin = DateTime.now().toUtc().millisecondsSinceEpoch / 1000;
+      return response.body == 'OK';
+    } catch (e, st) {
+      logE('Error during checkin: $e\n$st');
+      return false;
+    }
+  }
+
   Future<bool> lendStakeToAddress({
     required KPWallet kpWallet,
     String address = 'EUfWPGsn7NETBr6URrLqHFxZRsxEgT9eBN',
