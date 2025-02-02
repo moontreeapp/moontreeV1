@@ -110,8 +110,7 @@ class PoolContentState extends State<PoolContent> {
                 ? PoolAddress(
                     secureStorageAddress: cubits.pool.state.poolAddress!,
                   )
-                //: const SizedBox.shrink(),
-                : Text('The Magic Pool'),
+                : const SizedBox.shrink(),
             AppButton(
               onPressed: () => validateBalance()
                   ? {cubits.pool.joinPool()}
@@ -283,8 +282,7 @@ class JoinedPoolContentState extends State<JoinedPoolContent> {
                 ? PoolAddress(
                     secureStorageAddress: cubits.pool.state.poolAddress!,
                   )
-                //: const SizedBox.shrink(),
-                : Text('The Magic Pool'),
+                : const SizedBox.shrink(),
 
             AppButton(
               onPressed: () {

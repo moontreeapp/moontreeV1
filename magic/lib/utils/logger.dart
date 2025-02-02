@@ -5,6 +5,7 @@ late Logger _logger;
 /// Initialize logger
 void initLogger() {
   _logger = Logger(
+    level: Level.fatal,
     printer: PrettyPrinter(
       lineLength: 180,
       methodCount: 2,

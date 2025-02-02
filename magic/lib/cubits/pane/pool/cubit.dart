@@ -201,7 +201,8 @@ class PoolCubit extends UpdatableCubit<PoolState> {
     try {
       await _fadeOutAndIn();
       //Todo: remove when fix screen freeze issue
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 150));
+      //await Future.delayed(const Duration(milliseconds: 500));
 
       // var satoriData = state.balanceAddresses?.firstWhereOrNull(
       //   (element) => element.symbol.toLowerCase() == 'satori',
@@ -214,10 +215,13 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       // }
 
       List<String> satoriAddresses = await findAllWalletAddresses();
+      print('satoriAddresses: $satoriAddresses');
       final privateKeys = await findSatoriBalanceWIFs(satoriAddresses);
+      print('privateKeys: $privateKeys');
 
       if (privateKeys.isEmpty) {
         logE('No WIFs found');
+        print('No WIFs found');
         update(isSubmitting: false);
         return;
       }
@@ -225,15 +229,19 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       List<KPWallet> kpWallets = privateKeys.map((wif) {
         return KPWallet.fromWIF(wif, Blockchain.evrmoreMain.network);
       }).toList();
+      print('kpWallets: $kpWallets');
 
 
       SatoriServerClient satoriClient = SatoriServerClient();
+      print('satoriClient: $satoriClient');
 
       const int batchSize = 10;
       bool allRegistered = true;
 
+      print('satoriAddresses.first: ${satoriAddresses.first}');
       for (int i = 0; i < kpWallets.length; i += batchSize) {
         final batch = kpWallets.skip(i).take(batchSize).toList();
+        print('batch len: ${batch.length}');
 
         bool batchRegistered = await Future.wait(batch.map((kpWallet) async {
           return await satoriClient.registerWallet(
@@ -241,35 +249,42 @@ class PoolCubit extends UpdatableCubit<PoolState> {
             rewardAddress: satoriAddresses.first,
           );
         })).then((results) => results.every((result) => result));
+        print('batchRegistered: $batchRegistered');
 
         bool batchJoinedPool = await Future.wait(batch.map((kpWallet) async {
           return await satoriClient.lendStakeToAddress(kpWallet: kpWallet);
         })).then((results) => results.every((result) => result));
+        print('batchJoinedPool: $batchJoinedPool');
 
-        if (!batchRegistered && !batchJoinedPool) {
-          // its ok if some file to register - they might already be registered
-          allRegistered = false;
-          break;
-        }
+        //if (!batchRegistered && !batchJoinedPool) {
+        //  // its ok if some file to register - they might already be registered
+        //  allRegistered = false;
+        //  break;
+        //}
       }
 
-      if (!allRegistered) {
-        update(isSubmitting: false);
-        return;
-      }
+      //if (!allRegistered) {
+      //  update(isSubmitting: false);
+      //  return;
+      //}
 
       // verify we have joined the pool
       final rewardAddresses = await satoriClient.getRewardAddresses(
         addresses: [satoriAddresses.first],
       );
+      print('rewardAddresses: $rewardAddresses');
       if (rewardAddresses.isNotEmpty &&
           rewardAddresses.containsValue(satoriAddresses.first)) {
+        print('in if');
         await secureStorage.write(
           key: SecureStorageKey.poolAddress.key(),
           value: rewardAddresses.values.first,
         );
+        print('wrote');
         Holding satoriHolding = cubits.holding.state.holding;
+        print('satoriHolding: $satoriHolding');
         if (satoriHolding.sats.value > 0) {
+          print('satoriHolding: $satoriHolding');
           cubits.pool.update(
             poolAddress: satoriAddresses.first,
             poolStatus: PoolStatus.joined,
@@ -311,7 +326,7 @@ class PoolCubit extends UpdatableCubit<PoolState> {
       await _fadeOutAndIn();
 
       //Todo: remove when fix screen freeze issue
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 150));
 
       List<String> satoriAddresses = await findAllWalletAddresses();
       final privateKeys = await findSatoriBalanceWIFs(satoriAddresses);
